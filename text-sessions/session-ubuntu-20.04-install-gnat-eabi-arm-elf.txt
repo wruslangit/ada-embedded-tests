@@ -1,0 +1,715 @@
+File: session-ubuntu-20.04-install-gnat-eabi-arm-elf.txt
+
+Ub2004-rt38:~$ date
+Wed 06 Jan 2021 03:28:42 PM +08
+
+Ub2004-rt38:~$ uname -a
+Linux HPEliteBook8470p-Ub2004-rt38 5.4.66-rt38 
+#1 SMP PREEMPT_RT Sat Sep 26 16:51:59 +08 2020 x86_64 x86_64 x86_64 GNU/Linux
+
+Ub2004-rt38:~$ lsb_release -a
+LSB Version:	core-11.1.0ubuntu2-noarch:security-11.1.0ubuntu2-noarch
+Distributor ID:	Ubuntu
+Description:	Ubuntu 20.04.1 LTS
+Release:        20.04
+Codename:       focal
+Ub2004-rt38:~$ 
+
+===========================================================
+CURRENT OBJECTIVE locate system.ads | grep /usr/lib
+
+/usr/lib/gcc/x86_64-linux-gnu/9/adainclude/system.ads
+Ub2004-rt38:~$ 
+
+===========================================================
+ABBREVIATIONS
+===========================================================
+RTS = Run Time System
+ZFP = Zero Foot Print
+SJLJ = Setup Jump Long Jump (library)
+ABI = Application Binary Interface
+HF = Hard Float
+ARM = Advanced RISC Machine Company.
+ELF = Executable Linux Format
+
+===========================================================
+NATIVE GCC TOOLCHAIN (9.3.0)
+===========================================================
+Ub2004-rt38:~$ which gcc
+/usr/bin/gcc
+
+Ub2004-rt38:~$ which g++
+/usr/bin/g++
+
+===========================================================
+Ub2004-rt38:~$ gcc -v
+Using built-in specs.
+COLLECT_GCC=gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/9/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none:hsa
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v 
+--with-pkgversion='Ubuntu 9.3.0-17ubuntu1~20.04' 
+--with-bugurl=file:///usr/share/doc/gcc-9/README.Bugs 
+--enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++,gm2 
+--prefix=/usr 
+--with-gcc-major-version-only 
+--program-suffix=-9 
+--program-prefix=x86_64-linux-gnu- 
+--enable-shared 
+--enable-linker-build-id 
+--libexecdir=/usr/lib 
+--without-included-gettext 
+--enable-threads=posix 
+--libdir=/usr/lib 
+--enable-nls 
+--enable-clocale=gnu 
+--enable-libstdcxx-debug 
+--enable-libstdcxx-time=yes 
+--with-default-libstdcxx-abi=new 
+--enable-gnu-unique-object 
+--disable-vtable-verify 
+--enable-plugin 
+--enable-default-pie 
+--with-system-zlib 
+--with-target-system-zlib=auto 
+--enable-objc-gc=auto 
+--enable-multiarch 
+--disable-werror 
+--with-arch-32=i686 
+--with-abi=m64 
+--with-multilib-list=m32,m64,mx32 
+--enable-multilib 
+--with-tune=generic 
+--enable-offload-targets=nvptx-none=/build/gcc-9-HskZEa/gcc-9-9.3.0/debian/tmp-nvptx/usr,hsa 
+--without-cuda-driver 
+--enable-checking=release 
+--build=x86_64-linux-gnu 
+--host=x86_64-linux-gnu 
+--target=x86_64-linux-gnu
+Thread model: posix
+gcc version 9.3.0 (Ubuntu 9.3.0-17ubuntu1~20.04) 
+Ub2004-rt38:~$ 
+
+===========================================================
+Ub2004-rt38:~$ g++ -v
+Using built-in specs.
+COLLECT_GCC=g++
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/9/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none:hsa
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v 
+--with-pkgversion='Ubuntu 9.3.0-17ubuntu1~20.04' 
+--with-bugurl=file:///usr/share/doc/gcc-9/README.Bugs 
+--enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++,gm2 
+--prefix=/usr 
+--with-gcc-major-version-only 
+--program-suffix=-9 
+--program-prefix=x86_64-linux-gnu- 
+--enable-shared 
+--enable-linker-build-id 
+--libexecdir=/usr/lib 
+--without-included-gettext 
+--enable-threads=posix 
+--libdir=/usr/lib 
+--enable-nls 
+--enable-clocale=gnu 
+--enable-libstdcxx-debug 
+--enable-libstdcxx-time=yes 
+--with-default-libstdcxx-abi=new 
+--enable-gnu-unique-object 
+--disable-vtable-verify 
+--enable-plugin 
+--enable-default-pie 
+--with-system-zlib 
+--with-target-system-zlib=auto 
+--enable-objc-gc=auto 
+--enable-multiarch 
+--disable-werror 
+--with-arch-32=i686 
+--with-abi=m64 
+--with-multilib-list=m32,m64,mx32 
+--enable-multilib 
+--with-tune=generic 
+--enable-offload-targets=nvptx-none=/build/gcc-9-HskZEa/gcc-9-9.3.0/debian/tmp-nvptx/usr,hsa 
+--without-cuda-driver 
+--enable-checking=release 
+--build=x86_64-linux-gnu 
+--host=x86_64-linux-gnu 
+--target=x86_64-linux-gnu
+Thread model: posix
+gcc version 9.3.0 (Ubuntu 9.3.0-17ubuntu1~20.04) 
+Ub2004-rt38:~$ 
+
+===========================================================
+GNAT NATIVE TOOLCHAIN  (9.3.0)
+===========================================================
+Ub2004-rt38:~$ which gprbuild
+/usr/bin/gprbuild
+
+Ub2004-rt38:~$ which gnatmake
+/usr/bin/gnatmake
+
+Ub2004-rt38:~$ which gnatbind
+/usr/bin/gnatbind
+
+Ub2004-rt38:~$ which gnatlink
+/usr/bin/gnatlink
+
+Ub2004-rt38:~$ which gnat-gps
+/usr/bin/gnat-gps
+
+Ub2004-rt38:~$ which gnatgcc
+/usr/bin/gnatgcc
+
+===========================================================
+Ub2004-rt38:~$ gprbuild --version
+GPRBUILD Community 2019 (20190517) (x86_64-pc-linux-gnu)
+
+Ub2004-rt38:~$ gnatmake --version
+GNATMAKE 9.3.0
+
+Ub2004-rt38:~$ gnatbind --version
+GNATBIND 9.3.0
+
+Ub2004-rt38:~$ gnatlink --version
+GNATLINK 9.3.0
+
+Ub2004-rt38:~$ gnat-gps --version
+GPS 19.2 (@GPS_DATE@) hosted on x86_64-linux-gnu)
+
+Ub2004-rt38:~$ gnatgcc --version
+gnatgcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0
+
+===========================================================
+USE SYNAPTIC TO INSTALL ARM-ELF CROSS_COMPILATION SYSTEM 
+=========================================================== 
+gnat-9
+gnat-9-arm-linux-gnueabi
+gnat-9-arm-linux-gnueabihf
+gnat-9-doc
+gnat-9-x86-64-linux-gnux32
+gnat-gps
+gnat-gps-common
+gnat-gps-doc
+
+x32 is a new ABI being actively worked on. It is basically 32-bit code 
+running in x86_64 (x64) mode on the CPU so that it has access to the 
+additional 8 registers to boost program speed while remaining memory 
+efficient via the use of 32-bit pointers. 
+
+x32 is an ABI for amd64/x86_64 CPUs using 32-bit integers, longs and pointers. 
+The idea is to combine the smaller memory and cache footprint from 32-bit 
+data types with the larger register set of x86_64. 
+
+===========================================================
+INSTALLED GNAT TOOLCHAIN INSIDE /usr/bin
+===========================================================
+Ub2004-rt38:~$ ls -al /usr/bin | grep gnat
+lrwxrwxrwx  1 root   root             24 Sep 16 20:33 arm-linux-gnueabi-gnat -> arm-linux-gnueabi-gnat-9
+-rwxr-xr-x  1 root   root        1369416 Sep 16 20:33 arm-linux-gnueabi-gnat-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatbind -> arm-linux-gnueabi-gnatbind-9
+-rwxr-xr-x  1 root   root        2135856 Sep 16 20:33 arm-linux-gnueabi-gnatbind-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatchop -> arm-linux-gnueabi-gnatchop-9
+-rwxr-xr-x  1 root   root        1669240 Sep 16 20:33 arm-linux-gnueabi-gnatchop-9
+lrwxrwxrwx  1 root   root             29 Sep 16 20:33 arm-linux-gnueabi-gnatclean -> arm-linux-gnueabi-gnatclean-9
+-rwxr-xr-x  1 root   root        2313552 Sep 16 20:33 arm-linux-gnueabi-gnatclean-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatfind -> arm-linux-gnueabi-gnatfind-9
+-rwxr-xr-x  1 root   root        1636488 Sep 16 20:33 arm-linux-gnueabi-gnatfind-9
+lrwxrwxrwx  1 root   root             23 Sep 16 20:33 arm-linux-gnueabi-gnatgcc -> arm-linux-gnueabi-gcc-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnathtml -> arm-linux-gnueabi-gnathtml-9
+-rwxr-xr-x  1 root   root          32139 Sep 16 20:33 arm-linux-gnueabi-gnathtml-9
+lrwxrwxrwx  1 root   root             26 Sep 16 20:33 arm-linux-gnueabi-gnatkr -> arm-linux-gnueabi-gnatkr-9
+-rwxr-xr-x  1 root   root        1315784 Sep 16 20:33 arm-linux-gnueabi-gnatkr-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatlink -> arm-linux-gnueabi-gnatlink-9
+-rwxr-xr-x  1 root   root        1459840 Sep 16 20:33 arm-linux-gnueabi-gnatlink-9
+lrwxrwxrwx  1 root   root             26 Sep 16 20:33 arm-linux-gnueabi-gnatls -> arm-linux-gnueabi-gnatls-9
+-rwxr-xr-x  1 root   root        2506352 Sep 16 20:33 arm-linux-gnueabi-gnatls-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatmake -> arm-linux-gnueabi-gnatmake-9
+-rwxr-xr-x  1 root   root        2662904 Sep 16 20:33 arm-linux-gnueabi-gnatmake-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatname -> arm-linux-gnueabi-gnatname-9
+-rwxr-xr-x  1 root   root        2259792 Sep 16 20:33 arm-linux-gnueabi-gnatname-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatprep -> arm-linux-gnueabi-gnatprep-9
+-rwxr-xr-x  1 root   root        2411792 Sep 16 20:33 arm-linux-gnueabi-gnatprep-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatxref -> arm-linux-gnueabi-gnatxref-9
+-rwxr-xr-x  1 root   root        1636488 Sep 16 20:33 arm-linux-gnueabi-gnatxref-9
+lrwxrwxrwx  1 root   root             26 Sep 16 20:33 arm-linux-gnueabihf-gnat -> arm-linux-gnueabihf-gnat-9
+-rwxr-xr-x  1 root   root        1369416 Sep 16 20:33 arm-linux-gnueabihf-gnat-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatbind -> arm-linux-gnueabihf-gnatbind-9
+-rwxr-xr-x  1 root   root        2135856 Sep 16 20:33 arm-linux-gnueabihf-gnatbind-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatchop -> arm-linux-gnueabihf-gnatchop-9
+-rwxr-xr-x  1 root   root        1669240 Sep 16 20:33 arm-linux-gnueabihf-gnatchop-9
+lrwxrwxrwx  1 root   root             31 Sep 16 20:33 arm-linux-gnueabihf-gnatclean -> arm-linux-gnueabihf-gnatclean-9
+-rwxr-xr-x  1 root   root        2313552 Sep 16 20:33 arm-linux-gnueabihf-gnatclean-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatfind -> arm-linux-gnueabihf-gnatfind-9
+-rwxr-xr-x  1 root   root        1636488 Sep 16 20:33 arm-linux-gnueabihf-gnatfind-9
+lrwxrwxrwx  1 root   root             25 Sep 16 20:33 arm-linux-gnueabihf-gnatgcc -> arm-linux-gnueabihf-gcc-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnathtml -> arm-linux-gnueabihf-gnathtml-9
+-rwxr-xr-x  1 root   root          32139 Sep 16 20:33 arm-linux-gnueabihf-gnathtml-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabihf-gnatkr -> arm-linux-gnueabihf-gnatkr-9
+-rwxr-xr-x  1 root   root        1315784 Sep 16 20:33 arm-linux-gnueabihf-gnatkr-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatlink -> arm-linux-gnueabihf-gnatlink-9
+-rwxr-xr-x  1 root   root        1459840 Sep 16 20:33 arm-linux-gnueabihf-gnatlink-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabihf-gnatls -> arm-linux-gnueabihf-gnatls-9
+-rwxr-xr-x  1 root   root        2506352 Sep 16 20:33 arm-linux-gnueabihf-gnatls-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatmake -> arm-linux-gnueabihf-gnatmake-9
+-rwxr-xr-x  1 root   root        2662904 Sep 16 20:33 arm-linux-gnueabihf-gnatmake-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatname -> arm-linux-gnueabihf-gnatname-9
+-rwxr-xr-x  1 root   root        2259792 Sep 16 20:33 arm-linux-gnueabihf-gnatname-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatprep -> arm-linux-gnueabihf-gnatprep-9
+-rwxr-xr-x  1 root   root        2411792 Sep 16 20:33 arm-linux-gnueabihf-gnatprep-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatxref -> arm-linux-gnueabihf-gnatxref-9
+-rwxr-xr-x  1 root   root        1636488 Sep 16 20:33 arm-linux-gnueabihf-gnatxref-9
+lrwxrwxrwx  1 root   root              6 Aug  8 20:04 gnat -> gnat-9
+lrwxrwxrwx  1 root   root             23 Aug  8 20:04 gnat-9 -> x86_64-linux-gnu-gnat-9
+lrwxrwxrwx  1 root   root             10 Aug  8 20:04 gnatbind -> gnatbind-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 gnatbind-9 -> x86_64-linux-gnu-gnatbind-9
+lrwxrwxrwx  1 root   root             10 Aug  8 20:04 gnatchop -> gnatchop-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 gnatchop-9 -> x86_64-linux-gnu-gnatchop-9
+lrwxrwxrwx  1 root   root             11 Aug  8 20:04 gnatclean -> gnatclean-9
+lrwxrwxrwx  1 root   root             28 Aug  8 20:04 gnatclean-9 -> x86_64-linux-gnu-gnatclean-9
+-rwxr-xr-x  1 root   root         350600 Mar 25  2020 gnatcoll_sqlite2ada
+-rwxr-xr-x  1 root   root       10252416 Feb 26  2020 gnatdoc
+lrwxrwxrwx  1 root   root             10 Aug  8 20:04 gnatfind -> gnatfind-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 gnatfind-9 -> x86_64-linux-gnu-gnatfind-9
+lrwxrwxrwx  1 root   root             31 Nov 22 15:22 gnatgcc -> /usr/bin/x86_64-linux-gnu-gcc-9
+lrwxrwxrwx  1 root   root             22 Aug  8 20:04 gnatgcc-OLD -> x86_64-linux-gnu-gcc-9
+-rwxr-xr-x  1 root   root       53806096 Feb 26  2020 gnat-gps
+lrwxrwxrwx  1 root   root             10 Aug  8 20:04 gnathtml -> gnathtml-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 gnathtml-9 -> x86_64-linux-gnu-gnathtml-9
+-rwxr-xr-x  1 root   root         211464 Mar 25  2020 gnatinspect
+lrwxrwxrwx  1 root   root              8 Aug  8 20:04 gnatkr -> gnatkr-9
+lrwxrwxrwx  1 root   root             25 Aug  8 20:04 gnatkr-9 -> x86_64-linux-gnu-gnatkr-9
+lrwxrwxrwx  1 root   root             10 Aug  8 20:04 gnatlink -> gnatlink-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 gnatlink-9 -> x86_64-linux-gnu-gnatlink-9
+lrwxrwxrwx  1 root   root              8 Aug  8 20:04 gnatls -> gnatls-9
+lrwxrwxrwx  1 root   root             25 Aug  8 20:04 gnatls-9 -> x86_64-linux-gnu-gnatls-9
+lrwxrwxrwx  1 root   root             10 Aug  8 20:04 gnatmake -> gnatmake-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 gnatmake-9 -> x86_64-linux-gnu-gnatmake-9
+lrwxrwxrwx  1 root   root             10 Aug  8 20:04 gnatname -> gnatname-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 gnatname-9 -> x86_64-linux-gnu-gnatname-9
+lrwxrwxrwx  1 root   root             10 Aug  8 20:04 gnatprep -> gnatprep-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 gnatprep-9 -> x86_64-linux-gnu-gnatprep-9
+lrwxrwxrwx  1 root   root             10 Aug  8 20:04 gnatxref -> gnatxref-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 gnatxref-9 -> x86_64-linux-gnu-gnatxref-9
+lrwxrwxrwx  1 root   root             23 Aug  8 20:04 x86_64-linux-gnu-gnat -> x86_64-linux-gnu-gnat-9
+-rwxr-xr-x  1 root   root         661296 Aug  8 20:04 x86_64-linux-gnu-gnat-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 x86_64-linux-gnu-gnatbind -> x86_64-linux-gnu-gnatbind-9
+-rwxr-xr-x  1 root   root        1015440 Aug  8 20:04 x86_64-linux-gnu-gnatbind-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 x86_64-linux-gnu-gnatchop -> x86_64-linux-gnu-gnatchop-9
+-rwxr-xr-x  1 root   root         686256 Aug  8 20:04 x86_64-linux-gnu-gnatchop-9
+lrwxrwxrwx  1 root   root             28 Aug  8 20:04 x86_64-linux-gnu-gnatclean -> x86_64-linux-gnu-gnatclean-9
+-rwxr-xr-x  1 root   root         814064 Aug  8 20:04 x86_64-linux-gnu-gnatclean-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 x86_64-linux-gnu-gnatfind -> x86_64-linux-gnu-gnatfind-9
+-rwxr-xr-x  1 root   root         739760 Aug  8 20:04 x86_64-linux-gnu-gnatfind-9
+lrwxrwxrwx  1 root   root             22 Aug  8 20:04 x86_64-linux-gnu-gnatgcc -> x86_64-linux-gnu-gcc-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 x86_64-linux-gnu-gnathtml -> x86_64-linux-gnu-gnathtml-9
+-rwxr-xr-x  1 root   root          32139 Aug  8 20:04 x86_64-linux-gnu-gnathtml-9
+lrwxrwxrwx  1 root   root             25 Aug  8 20:04 x86_64-linux-gnu-gnatkr -> x86_64-linux-gnu-gnatkr-9
+-rwxr-xr-x  1 root   root         648816 Aug  8 20:04 x86_64-linux-gnu-gnatkr-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 x86_64-linux-gnu-gnatlink -> x86_64-linux-gnu-gnatlink-9
+-rwxr-xr-x  1 root   root         755952 Aug  8 20:04 x86_64-linux-gnu-gnatlink-9
+lrwxrwxrwx  1 root   root             25 Aug  8 20:04 x86_64-linux-gnu-gnatls -> x86_64-linux-gnu-gnatls-9
+-rwxr-xr-x  1 root   root         954000 Aug  8 20:04 x86_64-linux-gnu-gnatls-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 x86_64-linux-gnu-gnatmake -> x86_64-linux-gnu-gnatmake-9
+-rwxr-xr-x  1 root   root        1057296 Aug  8 20:04 x86_64-linux-gnu-gnatmake-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 x86_64-linux-gnu-gnatname -> x86_64-linux-gnu-gnatname-9
+-rwxr-xr-x  1 root   root         756304 Aug  8 20:04 x86_64-linux-gnu-gnatname-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 x86_64-linux-gnu-gnatprep -> x86_64-linux-gnu-gnatprep-9
+-rwxr-xr-x  1 root   root         859440 Aug  8 20:04 x86_64-linux-gnu-gnatprep-9
+lrwxrwxrwx  1 root   root             27 Aug  8 20:04 x86_64-linux-gnu-gnatxref -> x86_64-linux-gnu-gnatxref-9
+-rwxr-xr-x  1 root   root         739760 Aug  8 20:04 x86_64-linux-gnu-gnatxref-9
+lrwxrwxrwx  1 root   root             26 Sep 16 20:48 x86_64-linux-gnux32-gnat -> x86_64-linux-gnux32-gnat-9
+-rwxr-xr-x  1 root   root         910600 Sep 16 20:48 x86_64-linux-gnux32-gnat-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:48 x86_64-linux-gnux32-gnatbind -> x86_64-linux-gnux32-gnatbind-9
+-rwxr-xr-x  1 root   root        1677040 Sep 16 20:48 x86_64-linux-gnux32-gnatbind-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:48 x86_64-linux-gnux32-gnatchop -> x86_64-linux-gnux32-gnatchop-9
+-rwxr-xr-x  1 root   root        1206328 Sep 16 20:48 x86_64-linux-gnux32-gnatchop-9
+lrwxrwxrwx  1 root   root             31 Sep 16 20:48 x86_64-linux-gnux32-gnatclean -> x86_64-linux-gnux32-gnatclean-9
+-rwxr-xr-x  1 root   root        1850640 Sep 16 20:48 x86_64-linux-gnux32-gnatclean-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:48 x86_64-linux-gnux32-gnatfind -> x86_64-linux-gnux32-gnatfind-9
+-rwxr-xr-x  1 root   root        1173576 Sep 16 20:48 x86_64-linux-gnux32-gnatfind-9
+lrwxrwxrwx  1 root   root             25 Sep 16 20:48 x86_64-linux-gnux32-gnatgcc -> x86_64-linux-gnux32-gcc-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:48 x86_64-linux-gnux32-gnathtml -> x86_64-linux-gnux32-gnathtml-9
+-rwxr-xr-x  1 root   root          32139 Sep 16 20:48 x86_64-linux-gnux32-gnathtml-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:48 x86_64-linux-gnux32-gnatkr -> x86_64-linux-gnux32-gnatkr-9
+-rwxr-xr-x  1 root   root         856968 Sep 16 20:48 x86_64-linux-gnux32-gnatkr-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:48 x86_64-linux-gnux32-gnatlink -> x86_64-linux-gnux32-gnatlink-9
+-rwxr-xr-x  1 root   root        1001024 Sep 16 20:48 x86_64-linux-gnux32-gnatlink-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:48 x86_64-linux-gnux32-gnatls -> x86_64-linux-gnux32-gnatls-9
+-rwxr-xr-x  1 root   root        2043440 Sep 16 20:48 x86_64-linux-gnux32-gnatls-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:48 x86_64-linux-gnux32-gnatmake -> x86_64-linux-gnux32-gnatmake-9
+-rwxr-xr-x  1 root   root        2199992 Sep 16 20:48 x86_64-linux-gnux32-gnatmake-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:48 x86_64-linux-gnux32-gnatname -> x86_64-linux-gnux32-gnatname-9
+-rwxr-xr-x  1 root   root        1796880 Sep 16 20:48 x86_64-linux-gnux32-gnatname-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:48 x86_64-linux-gnux32-gnatprep -> x86_64-linux-gnux32-gnatprep-9
+-rwxr-xr-x  1 root   root        1948880 Sep 16 20:48 x86_64-linux-gnux32-gnatprep-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:48 x86_64-linux-gnux32-gnatxref -> x86_64-linux-gnux32-gnatxref-9
+-rwxr-xr-x  1 root   root        1173576 Sep 16 20:48 x86_64-linux-gnux32-gnatxref-9
+Ub2004-rt38:~$ 
+
+===========================================================
+LOCATE INSIDE /usr/bin FOR arm-linux-gnueabi
+===========================================================
+Ub2004-rt38:~$ ls -al /usr/bin | grep arm-linux-gnueabi
+-rwxr-xr-x  1 root   root          35536 Apr  7  2020 arm-linux-gnueabi-addr2line
+-rwxr-xr-x  1 root   root          72120 Apr  7  2020 arm-linux-gnueabi-ar
+-rwxr-xr-x  1 root   root        1064072 Apr  7  2020 arm-linux-gnueabi-as
+-rwxr-xr-x  1 root   root          30992 Apr  7  2020 arm-linux-gnueabi-c++filt
+-rwxr-xr-x  1 root   root        1277136 Sep 16 20:33 arm-linux-gnueabi-cpp-9
+-rwxr-xr-x  1 root   root        2607736 Apr  7  2020 arm-linux-gnueabi-dwp
+-rwxr-xr-x  1 root   root          43696 Apr  7  2020 arm-linux-gnueabi-elfedit
+-rwxr-xr-x  1 root   root        1277136 Sep 16 20:33 arm-linux-gnueabi-gcc-9
+-rwxr-xr-x  1 root   root          35472 Sep 16 20:33 arm-linux-gnueabi-gcc-ar-9
+-rwxr-xr-x  1 root   root          35472 Sep 16 20:33 arm-linux-gnueabi-gcc-nm-9
+-rwxr-xr-x  1 root   root          35472 Sep 16 20:33 arm-linux-gnueabi-gcc-ranlib-9
+-rwxr-xr-x  1 root   root         680176 Sep 16 20:33 arm-linux-gnueabi-gcov-9
+-rwxr-xr-x  1 root   root         540808 Sep 16 20:33 arm-linux-gnueabi-gcov-dump-9
+-rwxr-xr-x  1 root   root         565448 Sep 16 20:33 arm-linux-gnueabi-gcov-tool-9
+lrwxrwxrwx  1 root   root             24 Sep 16 20:33 arm-linux-gnueabi-gnat -> arm-linux-gnueabi-gnat-9
+-rwxr-xr-x  1 root   root        1369416 Sep 16 20:33 arm-linux-gnueabi-gnat-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatbind -> arm-linux-gnueabi-gnatbind-9
+-rwxr-xr-x  1 root   root        2135856 Sep 16 20:33 arm-linux-gnueabi-gnatbind-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatchop -> arm-linux-gnueabi-gnatchop-9
+-rwxr-xr-x  1 root   root        1669240 Sep 16 20:33 arm-linux-gnueabi-gnatchop-9
+lrwxrwxrwx  1 root   root             29 Sep 16 20:33 arm-linux-gnueabi-gnatclean -> arm-linux-gnueabi-gnatclean-9
+-rwxr-xr-x  1 root   root        2313552 Sep 16 20:33 arm-linux-gnueabi-gnatclean-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatfind -> arm-linux-gnueabi-gnatfind-9
+-rwxr-xr-x  1 root   root        1636488 Sep 16 20:33 arm-linux-gnueabi-gnatfind-9
+lrwxrwxrwx  1 root   root             23 Sep 16 20:33 arm-linux-gnueabi-gnatgcc -> arm-linux-gnueabi-gcc-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnathtml -> arm-linux-gnueabi-gnathtml-9
+-rwxr-xr-x  1 root   root          32139 Sep 16 20:33 arm-linux-gnueabi-gnathtml-9
+lrwxrwxrwx  1 root   root             26 Sep 16 20:33 arm-linux-gnueabi-gnatkr -> arm-linux-gnueabi-gnatkr-9
+-rwxr-xr-x  1 root   root        1315784 Sep 16 20:33 arm-linux-gnueabi-gnatkr-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatlink -> arm-linux-gnueabi-gnatlink-9
+-rwxr-xr-x  1 root   root        1459840 Sep 16 20:33 arm-linux-gnueabi-gnatlink-9
+lrwxrwxrwx  1 root   root             26 Sep 16 20:33 arm-linux-gnueabi-gnatls -> arm-linux-gnueabi-gnatls-9
+-rwxr-xr-x  1 root   root        2506352 Sep 16 20:33 arm-linux-gnueabi-gnatls-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatmake -> arm-linux-gnueabi-gnatmake-9
+-rwxr-xr-x  1 root   root        2662904 Sep 16 20:33 arm-linux-gnueabi-gnatmake-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatname -> arm-linux-gnueabi-gnatname-9
+-rwxr-xr-x  1 root   root        2259792 Sep 16 20:33 arm-linux-gnueabi-gnatname-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatprep -> arm-linux-gnueabi-gnatprep-9
+-rwxr-xr-x  1 root   root        2411792 Sep 16 20:33 arm-linux-gnueabi-gnatprep-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatxref -> arm-linux-gnueabi-gnatxref-9
+-rwxr-xr-x  1 root   root        1636488 Sep 16 20:33 arm-linux-gnueabi-gnatxref-9
+-rwxr-xr-x  1 root   root         102280 Apr  7  2020 arm-linux-gnueabi-gprof
+-rwxr-xr-x  1 root   root          35536 Apr  7  2020 arm-linux-gnueabihf-addr2line
+-rwxr-xr-x  1 root   root          72120 Apr  7  2020 arm-linux-gnueabihf-ar
+-rwxr-xr-x  1 root   root        1064072 Apr  7  2020 arm-linux-gnueabihf-as
+-rwxr-xr-x  1 root   root          30992 Apr  7  2020 arm-linux-gnueabihf-c++filt
+-rwxr-xr-x  1 root   root        1277136 Sep 16 20:33 arm-linux-gnueabihf-cpp-9
+-rwxr-xr-x  1 root   root        2607736 Apr  7  2020 arm-linux-gnueabihf-dwp
+-rwxr-xr-x  1 root   root          43696 Apr  7  2020 arm-linux-gnueabihf-elfedit
+-rwxr-xr-x  1 root   root        1277136 Sep 16 20:33 arm-linux-gnueabihf-gcc-9
+-rwxr-xr-x  1 root   root          35472 Sep 16 20:33 arm-linux-gnueabihf-gcc-ar-9
+-rwxr-xr-x  1 root   root          35472 Sep 16 20:33 arm-linux-gnueabihf-gcc-nm-9
+-rwxr-xr-x  1 root   root          35472 Sep 16 20:33 arm-linux-gnueabihf-gcc-ranlib-9
+-rwxr-xr-x  1 root   root         680176 Sep 16 20:33 arm-linux-gnueabihf-gcov-9
+-rwxr-xr-x  1 root   root         540808 Sep 16 20:33 arm-linux-gnueabihf-gcov-dump-9
+-rwxr-xr-x  1 root   root         565448 Sep 16 20:33 arm-linux-gnueabihf-gcov-tool-9
+lrwxrwxrwx  1 root   root             26 Sep 16 20:33 arm-linux-gnueabihf-gnat -> arm-linux-gnueabihf-gnat-9
+-rwxr-xr-x  1 root   root        1369416 Sep 16 20:33 arm-linux-gnueabihf-gnat-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatbind -> arm-linux-gnueabihf-gnatbind-9
+-rwxr-xr-x  1 root   root        2135856 Sep 16 20:33 arm-linux-gnueabihf-gnatbind-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatchop -> arm-linux-gnueabihf-gnatchop-9
+-rwxr-xr-x  1 root   root        1669240 Sep 16 20:33 arm-linux-gnueabihf-gnatchop-9
+lrwxrwxrwx  1 root   root             31 Sep 16 20:33 arm-linux-gnueabihf-gnatclean -> arm-linux-gnueabihf-gnatclean-9
+-rwxr-xr-x  1 root   root        2313552 Sep 16 20:33 arm-linux-gnueabihf-gnatclean-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatfind -> arm-linux-gnueabihf-gnatfind-9
+-rwxr-xr-x  1 root   root        1636488 Sep 16 20:33 arm-linux-gnueabihf-gnatfind-9
+lrwxrwxrwx  1 root   root             25 Sep 16 20:33 arm-linux-gnueabihf-gnatgcc -> arm-linux-gnueabihf-gcc-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnathtml -> arm-linux-gnueabihf-gnathtml-9
+-rwxr-xr-x  1 root   root          32139 Sep 16 20:33 arm-linux-gnueabihf-gnathtml-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabihf-gnatkr -> arm-linux-gnueabihf-gnatkr-9
+-rwxr-xr-x  1 root   root        1315784 Sep 16 20:33 arm-linux-gnueabihf-gnatkr-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatlink -> arm-linux-gnueabihf-gnatlink-9
+-rwxr-xr-x  1 root   root        1459840 Sep 16 20:33 arm-linux-gnueabihf-gnatlink-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabihf-gnatls -> arm-linux-gnueabihf-gnatls-9
+-rwxr-xr-x  1 root   root        2506352 Sep 16 20:33 arm-linux-gnueabihf-gnatls-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatmake -> arm-linux-gnueabihf-gnatmake-9
+-rwxr-xr-x  1 root   root        2662904 Sep 16 20:33 arm-linux-gnueabihf-gnatmake-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatname -> arm-linux-gnueabihf-gnatname-9
+-rwxr-xr-x  1 root   root        2259792 Sep 16 20:33 arm-linux-gnueabihf-gnatname-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatprep -> arm-linux-gnueabihf-gnatprep-9
+-rwxr-xr-x  1 root   root        2411792 Sep 16 20:33 arm-linux-gnueabihf-gnatprep-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatxref -> arm-linux-gnueabihf-gnatxref-9
+-rwxr-xr-x  1 root   root        1636488 Sep 16 20:33 arm-linux-gnueabihf-gnatxref-9
+-rwxr-xr-x  1 root   root         102280 Apr  7  2020 arm-linux-gnueabihf-gprof
+lrwxrwxrwx  1 root   root             26 Apr  7  2020 arm-linux-gnueabihf-ld -> arm-linux-gnueabihf-ld.bfd
+-rwxr-xr-x  1 root   root         761536 Apr  7  2020 arm-linux-gnueabihf-ld.bfd
+-rwxr-xr-x  1 root   root        5234384 Apr  7  2020 arm-linux-gnueabihf-ld.gold
+-rwxr-xr-x  1 root   root          52664 Apr  7  2020 arm-linux-gnueabihf-nm
+-rwxr-xr-x  1 root   root         186856 Apr  7  2020 arm-linux-gnueabihf-objcopy
+-rwxr-xr-x  1 root   root         402256 Apr  7  2020 arm-linux-gnueabihf-objdump
+-rwxr-xr-x  1 root   root          72152 Apr  7  2020 arm-linux-gnueabihf-ranlib
+-rwxr-xr-x  1 root   root         658360 Apr  7  2020 arm-linux-gnueabihf-readelf
+-rwxr-xr-x  1 root   root          35280 Apr  7  2020 arm-linux-gnueabihf-size
+-rwxr-xr-x  1 root   root          35488 Apr  7  2020 arm-linux-gnueabihf-strings
+-rwxr-xr-x  1 root   root         186856 Apr  7  2020 arm-linux-gnueabihf-strip
+lrwxrwxrwx  1 root   root             24 Apr  7  2020 arm-linux-gnueabi-ld -> arm-linux-gnueabi-ld.bfd
+-rwxr-xr-x  1 root   root         761536 Apr  7  2020 arm-linux-gnueabi-ld.bfd
+-rwxr-xr-x  1 root   root        5234384 Apr  7  2020 arm-linux-gnueabi-ld.gold
+-rwxr-xr-x  1 root   root          52664 Apr  7  2020 arm-linux-gnueabi-nm
+-rwxr-xr-x  1 root   root         186856 Apr  7  2020 arm-linux-gnueabi-objcopy
+-rwxr-xr-x  1 root   root         402256 Apr  7  2020 arm-linux-gnueabi-objdump
+-rwxr-xr-x  1 root   root          72152 Apr  7  2020 arm-linux-gnueabi-ranlib
+-rwxr-xr-x  1 root   root         658360 Apr  7  2020 arm-linux-gnueabi-readelf
+-rwxr-xr-x  1 root   root          35280 Apr  7  2020 arm-linux-gnueabi-size
+-rwxr-xr-x  1 root   root          35488 Apr  7  2020 arm-linux-gnueabi-strings
+-rwxr-xr-x  1 root   root         186856 Apr  7  2020 arm-linux-gnueabi-strip
+Ub2004-rt38:~$ 
+
+===========================================================
+GNAT PROJECT (GPR)
+===========================================================
+Ub2004-rt38:~$ ls -al /usr/bin | grep gpr
+-rwxr-xr-x  1 root   root         102280 Apr  7  2020 arm-linux-gnueabi-gprof
+-rwxr-xr-x  1 root   root         102280 Apr  7  2020 arm-linux-gnueabihf-gprof
+-rwxr-xr-x  1 root   root        1744272 Feb 25  2020 gprbuild
+-rwxr-xr-x  1 root   root         129400 Feb 25  2020 gprclean
+-rwxr-xr-x  1 root   root          84368 Feb 25  2020 gprconfig
+-rwxr-xr-x  1 root   root         680832 Mar  4  2020 gpre
+-rwxr-xr-x  1 root   root        1002464 Feb 25  2020 gprinstall
+-rwxr-xr-x  1 root   root         461584 Feb 25  2020 gprls
+-rwxr-xr-x  1 root   root         634136 Feb 25  2020 gprname
+lrwxrwxrwx  1 root   root             22 Apr  7  2020 gprof -> x86_64-linux-gnu-gprof
+lrwxrwxrwx  1 root   root             25 Jan 17  2020 gprolog -> /etc/alternatives/gprolog
+-rwxr-xr-x  1 root   root         518512 Feb 25  2020 gprslave
+-rwxr-xr-x  1 root   root         102280 Apr  7  2020 x86_64-linux-gnu-gprof
+-rwxr-xr-x  1 root   root         102280 Apr  7  2020 x86_64-linux-gnux32-gprof
+Ub2004-rt38:~$ 
+
+===========================================================
+LOCATE INSIDE /usr/lib/ FOR system.ads
+===========================================================
+Ub2004-rt38:~$ locate system.ads | grep /usr/lib
+/usr/lib/gcc/x86_64-linux-gnu/9/adainclude/system.ads
+/usr/lib/gcc-cross/arm-linux-gnueabi/9/adainclude/system.ads
+/usr/lib/gcc-cross/arm-linux-gnueabihf/9/adainclude/system.ads
+/usr/lib/gcc-cross/x86_64-linux-gnux32/9/adainclude/system.ads
+Ub2004-rt38:~$ 
+
+===========================================================
+IDENTIFIED ARM COMPILER 
+arm-linux-gnueabi-gnatgcc -> arm-linux-gnueabi-gcc-9
+
+===========================================================
+TEST ARM-ELF COMPILATION (SUCCESS)
+===========================================================
+Ub2004-rt38:~/github/ada-embedded$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m0 -mthumb -mfloat-abi=soft ada_bismillah.adb
+Ub2004-rt38:~/github/ada-embedded$ 
+Ub2004-rt38:~/github/ada-embedded$ ls -al
+total 28
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:32 .
+drwxrwxr-x 13 wruslan wruslan 4096 Jan  5 11:29 ..
+-rw-rw-r--  1 wruslan wruslan  226 Jan  5 11:39 ada_bismillah.adb
+-rw-rw-r--  1 wruslan wruslan  572 Jan  6 16:32 ada_bismillah.ads
+-rw-rw-r--  1 wruslan wruslan  529 Jan  6 16:32 ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  829 Jan  6 16:32 ada_bismillah.s
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:30 text-sessions
+Ub2004-rt38:~/github/ada-embedded$ mv ada_bismillah.ali m0-ada_bismillah.ali 
+Ub2004-rt38:~/github/ada-embedded$ mv ada_bismillah.s   m0-ada_bismillah.s 
+Ub2004-rt38:~/github/ada-embedded$ 
+
+===========================================================
+Ub2004-rt38:~/github/ada-embedded$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m3 -mthumb ada_bismillah.adb
+Ub2004-rt38:~/github/ada-embedded$ 
+Ub2004-rt38:~/github/ada-embedded$ ls -al
+total 36
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:34 .
+drwxrwxr-x 13 wruslan wruslan 4096 Jan  5 11:29 ..
+-rw-rw-r--  1 wruslan wruslan  226 Jan  5 11:39 ada_bismillah.adb
+-rw-rw-r--  1 wruslan wruslan  572 Jan  6 16:32 ada_bismillah.ads
+-rw-rw-r--  1 wruslan wruslan  528 Jan  6 16:34 ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  852 Jan  6 16:34 ada_bismillah.s
+-rw-rw-r--  1 wruslan wruslan  529 Jan  6 16:32 m0-ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  829 Jan  6 16:32 m0-ada_bismillah.s
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:34 text-sessions
+Ub2004-rt38:~/github/ada-embedded$ mv ada_bismillah.s   m3-ada_bismillah.s 
+Ub2004-rt38:~/github/ada-embedded$ mv ada_bismillah.ali m3-ada_bismillah.ali 
+Ub2004-rt38:~/github/ada-embedded$ 
+
+===========================================================
+Ub2004-rt38:~/github/ada-embedded$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m7 -mthumb ada_bismillah.adb
+Ub2004-rt38:~/github/ada-embedded$ ls -al
+total 44
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:36 .
+drwxrwxr-x 13 wruslan wruslan 4096 Jan  5 11:29 ..
+-rw-rw-r--  1 wruslan wruslan  226 Jan  5 11:39 ada_bismillah.adb
+-rw-rw-r--  1 wruslan wruslan  572 Jan  6 16:32 ada_bismillah.ads
+-rw-rw-r--  1 wruslan wruslan  529 Jan  6 16:36 ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  853 Jan  6 16:36 ada_bismillah.s
+-rw-rw-r--  1 wruslan wruslan  529 Jan  6 16:32 m0-ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  829 Jan  6 16:32 m0-ada_bismillah.s
+-rw-rw-r--  1 wruslan wruslan  528 Jan  6 16:34 m3-ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  852 Jan  6 16:34 m3-ada_bismillah.s
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:36 text-sessions
+Ub2004-rt38:~/github/ada-embedded$ mv ada_bismillah.ali m7-ada_bismillah.ali 
+Ub2004-rt38:~/github/ada-embedded$ mv ada_bismillah.s   m7-ada_bismillah.s 
+Ub2004-rt38:~/github/ada-embedded$ 
+
+===========================================================
+Ub2004-rt38:~/github/ada-embedded$ ls -al
+total 44
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:37 .
+drwxrwxr-x 13 wruslan wruslan 4096 Jan  5 11:29 ..
+-rw-rw-r--  1 wruslan wruslan  226 Jan  5 11:39 ada_bismillah.adb
+-rw-rw-r--  1 wruslan wruslan  572 Jan  6 16:32 ada_bismillah.ads
+-rw-rw-r--  1 wruslan wruslan  529 Jan  6 16:32 m0-ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  829 Jan  6 16:32 m0-ada_bismillah.s
+-rw-rw-r--  1 wruslan wruslan  528 Jan  6 16:34 m3-ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  852 Jan  6 16:34 m3-ada_bismillah.s
+-rw-rw-r--  1 wruslan wruslan  529 Jan  6 16:36 m7-ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  853 Jan  6 16:36 m7-ada_bismillah.s
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:36 text-sessions
+Ub2004-rt38:~/github/ada-embedded$ 
+
+===========================================================
+DISPLAY ASSEMBLER CODES (xxx.s)
+===========================================================
+Ub2004-rt38:~/github/ada-embedded$ cat m7-ada_bismillah.s
+	.cpu cortex-m7
+	.eabi_attribute 20, 1
+	.eabi_attribute 21, 1
+	.eabi_attribute 23, 3
+	.eabi_attribute 24, 1
+	.eabi_attribute 25, 1
+	.eabi_attribute 26, 2
+	.eabi_attribute 30, 6
+	.eabi_attribute 34, 1
+	.file	"ada_bismillah.adb"
+	.text
+	.align	2
+	.global	run_bismillah
+	.arch armv7e-m
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	run_bismillah, %function
+run_bismillah:
+	.fnstart
+.LFB2:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 1, uses_anonymous_args = 0
+	@ link register save eliminated.
+	push	{r7}
+	.save {r7}
+	.setfp r7, sp, #0
+	add	r7, sp, #0
+.L3:
+	nop
+	b	.L3
+	.fnend
+	.size	run_bismillah, .-run_bismillah
+	.global	ada_bismillah_E
+	.data
+	.align	1
+	.type	ada_bismillah_E, %object
+	.size	ada_bismillah_E, 2
+ada_bismillah_E:
+	.space	2
+	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
+	.section	.note.GNU-stack,"",%progbits
+Ub2004-rt38:~/github/ada-embedded$ 
+
+===========================================================
+Ub2004-rt38:~/github/ada-embedded$ cat m3-ada_bismillah.s
+	.cpu cortex-m3
+	.eabi_attribute 20, 1
+	.eabi_attribute 21, 1
+	.eabi_attribute 23, 3
+	.eabi_attribute 24, 1
+	.eabi_attribute 25, 1
+	.eabi_attribute 26, 2
+	.eabi_attribute 30, 6
+	.eabi_attribute 34, 1
+	.file	"ada_bismillah.adb"
+	.text
+	.align	2
+	.global	run_bismillah
+	.arch armv7-m
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	run_bismillah, %function
+run_bismillah:
+	.fnstart
+.LFB2:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 1, uses_anonymous_args = 0
+	@ link register save eliminated.
+	push	{r7}
+	.save {r7}
+	.setfp r7, sp, #0
+	add	r7, sp, #0
+.L3:
+	nop
+	b	.L3
+	.fnend
+	.size	run_bismillah, .-run_bismillah
+	.global	ada_bismillah_E
+	.data
+	.align	1
+	.type	ada_bismillah_E, %object
+	.size	ada_bismillah_E, 2
+ada_bismillah_E:
+	.space	2
+	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
+	.section	.note.GNU-stack,"",%progbits
+Ub2004-rt38:~/github/ada-embedded$ 
+
+===========================================================
+Ub2004-rt38:~/github/ada-embedded$ cat m0-ada_bismillah.s
+	.cpu cortex-m0
+	.eabi_attribute 20, 1
+	.eabi_attribute 21, 1
+	.eabi_attribute 23, 3
+	.eabi_attribute 24, 1
+	.eabi_attribute 25, 1
+	.eabi_attribute 26, 2
+	.eabi_attribute 30, 6
+	.eabi_attribute 34, 0
+	.file	"ada_bismillah.adb"
+	.text
+	.align	2
+	.global	run_bismillah
+	.arch armv6s-m
+	.syntax unified
+	.code	16
+	.thumb_func
+	.fpu softvfp
+	.type	run_bismillah, %function
+run_bismillah:
+	.fnstart
+.LFB2:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 1, uses_anonymous_args = 0
+	push	{r7, lr}
+	.save {r7, lr}
+	.setfp r7, sp, #0
+	add	r7, sp, #0
+.L3:
+	nop
+	b	.L3
+	.fnend
+	.size	run_bismillah, .-run_bismillah
+	.global	ada_bismillah_E
+	.data
+	.align	1
+	.type	ada_bismillah_E, %object
+	.size	ada_bismillah_E, 2
+ada_bismillah_E:
+	.space	2
+	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
+	.section	.note.GNU-stack,"",%progbits
+Ub2004-rt38:~/github/ada-embedded$ 
+
+===========================================================
+ALHAMDULILLAH 3 TIMES WRY.
+===========================================================
+
