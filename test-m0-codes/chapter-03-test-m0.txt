@@ -1,0 +1,203 @@
+
+===========================================================
+GCC EQUIVALENTS FOR GNAT-ARM-ELF
+===========================================================
+gcc     ==> arm-linux-gnueabi-gnatgcc
+nm      ==> arm-linux-gnueabi-nm
+ld      ==> arm-linux-gnueabi-ld
+objcopy ==> arm-linux-gnueabi-objcopy
+
+Ub2004-rt38:~$ arm-linux-gnueabi-gnatgcc --version
+arm-linux-gnueabi-gnatgcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0
+
+Ub2004-rt38:~$ arm-linux-gnueabi-nm --version
+GNU nm (GNU Binutils for Ubuntu) 2.34
+
+Ub2004-rt38:~$ arm-linux-gnueabi-ld --version
+GNU ld (GNU Binutils for Ubuntu) 2.34
+
+Ub2004-rt38:~$ arm-linux-gnueabi-objcopy --version
+GNU objcopy (GNU Binutils for Ubuntu) 2.34
+
+===========================================================
+STARTING FILES
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ ls -al
+total 28
+drwxrwxr-x  2 wruslan wruslan 4096 Jan  6 22:46 .
+drwxrwxr-x 10 wruslan wruslan 4096 Jan  6 22:45 ..
+-rw-rw-r--  1 wruslan wruslan 5201 Jan  6 22:46 chapter-03-test-m0.txt
+-rw-r--r--  1 wruslan wruslan  218 Mar 12  2016 flash.ld
+-rw-r--r--  1 wruslan wruslan  122 Mar  4  2016 program.adb
+-rw-r--r--  1 wruslan wruslan   86 Mar  4  2016 program.ads
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+
+
+===========================================================
+$ gcc -S -mcpu=cortex-m0 -mthumb program.adb
+===========================================================
+$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m0 -mthumb program.adb
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m0 -mthumb program.adb
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ ls -al
+total 36
+drwxrwxr-x  2 wruslan wruslan 4096 Jan  6 22:47 .
+drwxrwxr-x 10 wruslan wruslan 4096 Jan  6 22:45 ..
+-rw-rw-r--  1 wruslan wruslan 5117 Jan  6 22:47 chapter-03-test-m0.txt
+-rw-r--r--  1 wruslan wruslan  218 Mar 12  2016 flash.ld
+-rw-r--r--  1 wruslan wruslan  122 Mar  4  2016 program.adb
+-rw-r--r--  1 wruslan wruslan   86 Mar  4  2016 program.ads
+-rw-rw-r--  1 wruslan wruslan  442 Jan  6 22:47 program.ali
+-rw-rw-r--  1 wruslan wruslan  749 Jan  6 22:47 program.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+
+===========================================================
+$ cat program.s
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ cat program.s
+	.cpu cortex-m0
+	.eabi_attribute 20, 1
+	.eabi_attribute 21, 1
+	.eabi_attribute 23, 3
+	.eabi_attribute 24, 1
+	.eabi_attribute 25, 1
+	.eabi_attribute 26, 2
+	.eabi_attribute 30, 6
+	.eabi_attribute 34, 0
+	.file	"program.adb"
+	.text
+	.align	2
+	.global	run
+	.arch armv6s-m
+	.syntax unified
+	.code	16
+	.thumb_func
+	.fpu softvfp
+	.type	run, %function
+run:
+	.fnstart
+.LFB2:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 1, uses_anonymous_args = 0
+	push	{r7, lr}
+	.save {r7, lr}
+	.setfp r7, sp, #0
+	add	r7, sp, #0
+.L3:
+	nop
+	b	.L3
+	.fnend
+	.size	run, .-run
+	.global	program_E
+	.data
+	.align	1
+	.type	program_E, %object
+	.size	program_E, 2
+program_E:
+	.space	2
+	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
+	.section	.note.GNU-stack,"",%progbits
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+
+
+===========================================================
+$ gcc -c -mcpu=cortex-m0 -mthumb -mfloat-abi=soft program.adb
+===========================================================
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m0 -mthumb -mfloat-abi=soft program.adb
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m0 -mthumb -mfloat-abi=soft program.adb
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ ls -al
+total 40
+drwxrwxr-x  2 wruslan wruslan 4096 Jan  6 22:52 .
+drwxrwxr-x 10 wruslan wruslan 4096 Jan  6 22:45 ..
+-rw-rw-r--  1 wruslan wruslan 5157 Jan  6 22:51 chapter-03-test-m0.txt
+-rw-r--r--  1 wruslan wruslan  218 Mar 12  2016 flash.ld
+-rw-r--r--  1 wruslan wruslan  122 Mar  4  2016 program.adb
+-rw-r--r--  1 wruslan wruslan   86 Mar  4  2016 program.ads
+-rw-rw-r--  1 wruslan wruslan  442 Jan  6 22:52 program.ali
+-rw-rw-r--  1 wruslan wruslan 1120 Jan  6 22:52 program.o
+-rw-rw-r--  1 wruslan wruslan  749 Jan  6 22:47 program.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+
+===========================================================
+$ nm program.o
+===========================================================
+$ arm-linux-gnueabi-nm program.o
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-nm program.o
+         U __aeabi_unwind_cpp_pr0
+00000000 D program_E
+00000000 T run
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+
+
+===========================================================
+$ ld -T flash.ld -o program.elf program.o
+===========================================================
+$ arm-linux-gnueabi-ld -T flash.ld -o program.elf program.o
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-ld -T flash.ld -o program.elf program.o
+arm-linux-gnueabi-ld: program.o:(.ARM.exidx+0x0): undefined reference to `__aeabi_unwind_cpp_pr0'
+ 
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabihf-ld -T flash.ld -o program.elf program.o
+arm-linux-gnueabihf-ld: program.o:(.ARM.exidx+0x0): undefined reference to `__aeabi_unwind_cpp_pr0'
+
+TO SOLVE THIS PROBLEM
+=======================================
+$ arm-linux-gnueabi-ld.gold -T flash.ld -o program.elf program.o
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-ld.gold -T flash.ld -o program.elf program.o
+program.o(.ARM.exidx+0x0): error: undefined reference to '__aeabi_unwind_cpp_pr0'
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabihf-ld.gold -T flash.ld -o program.elf program.o
+program.o(.ARM.exidx+0x0): error: undefined reference to '__aeabi_unwind_cpp_pr0'
+
+https://lists.linaro.org/pipermail/linaro-toolchain/2011-September/001675.html
+=======================================
+Also:
+
+__aeabi_unwind_cpp_pr0 is part of the standard ARM exception
+
+handling code and helps in unwinding the stack frame when an exception
+occurs.
+
+__aeabi_unwind_cpp_pr0 is defined in libgcc_eh.a
+
+
+Additionally, I believe the problem can be solved by coping
+
+/* Dummy functions to avoid linker complaints */
+void __aeabi_unwind_cpp_pr0(void)
+{
+};
+
+to cmemk.c
+
+
+I'm testing both methods again. If anything is different this time around
+I'll be posting back with more updates.
+
+
+===========================================================
+$ nm program.elf
+===========================================================
+
+
+
+
+===========================================================
+$ objcopy -O binary program.elf program.bin
+===========================================================
+
+
+
+===========================================================
+$ objcopy -O ihex program.elf program.hex
+===========================================================
+
+
+
+===========================================================
+ALHAMDULILLAH 3 TIMES WRY.
+===========================================================
+

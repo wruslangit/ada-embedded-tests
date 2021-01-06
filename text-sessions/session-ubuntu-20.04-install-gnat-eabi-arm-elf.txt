@@ -499,6 +499,23 @@ arm-linux-gnueabi-gnatgcc -> arm-linux-gnueabi-gcc-9
 ===========================================================
 TEST ARM-ELF COMPILATION (SUCCESS)
 ===========================================================
+The -S parameter below tells the compiler to prepare the assembly output 
+instead of an object file. 
+
+The -mcpu and -mthumb options are needed to limit the set of instructions 
+to those understood by the target microcontroller - in the first variant
+below, the Cortex-M0 chip was selected, which does not support floating-point 
+instructions, and the second variant will be used for Cortex-M3 or better. 
+
+When working with a specific chip, it makes sense to use values that 
+correspond with the target device - thanks to this, the compiler will be 
+free to use more elaborate instruction sets, leading to executables that 
+are both smaller and faster.
+
+If the command below was executed without errors, a new file (ada_bismillah.s), 
+the assembler codes, should be created in the same directory. 
+
+===========================================================
 Ub2004-rt38:~/github/ada-embedded$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m0 -mthumb -mfloat-abi=soft ada_bismillah.adb
 Ub2004-rt38:~/github/ada-embedded$ 
 Ub2004-rt38:~/github/ada-embedded$ ls -al

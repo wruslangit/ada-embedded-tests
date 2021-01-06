@@ -1,0 +1,153 @@
+
+===========================================================
+GCC EQUIVALENTS FOR GNAT-ARM-ELF
+===========================================================
+gcc     ==> arm-linux-gnueabi-gnatgcc
+nm      ==> arm-linux-gnueabi-nm
+ld      ==> arm-linux-gnueabi-ld
+objcopy ==> arm-linux-gnueabi-objcopy
+
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ ls -al
+total 28
+drwxrwxr-x 2 wruslan wruslan 4096 Jan  6 22:01 .
+drwxrwxr-x 8 wruslan wruslan 4096 Jan  6 22:01 ..
+-rw-r--r-- 1 wruslan wruslan  218 Mar 12  2016 flash.ld
+-rw-r--r-- 1 wruslan wruslan  122 Mar  4  2016 program.adb
+-rw-r--r-- 1 wruslan wruslan   86 Mar  4  2016 program.ads
+
+===========================================================
+$ gcc -S -mcpu=cortex-m7 -mthumb program.adb
+===========================================================
+$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m7 -mthumb program.adb
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m7 -mthumb program.adb
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ ls -al
+total 28
+drwxrwxr-x 2 wruslan wruslan 4096 Jan  6 22:02 .
+drwxrwxr-x 8 wruslan wruslan 4096 Jan  6 22:02 ..
+-rw-r--r-- 1 wruslan wruslan  218 Mar 12  2016 flash.ld
+-rw-r--r-- 1 wruslan wruslan  122 Mar  4  2016 program.adb
+-rw-r--r-- 1 wruslan wruslan   86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan  442 Jan  6 22:02 program.ali
+-rw-rw-r-- 1 wruslan wruslan  773 Jan  6 22:02 program.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ 
+
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ cat program.s
+	.cpu cortex-m7
+	.eabi_attribute 20, 1
+	.eabi_attribute 21, 1
+	.eabi_attribute 23, 3
+	.eabi_attribute 24, 1
+	.eabi_attribute 25, 1
+	.eabi_attribute 26, 2
+	.eabi_attribute 30, 6
+	.eabi_attribute 34, 1
+	.file	"program.adb"
+	.text
+	.align	2
+	.global	run
+	.arch armv7e-m
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	run, %function
+run:
+	.fnstart
+.LFB2:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 1, uses_anonymous_args = 0
+	@ link register save eliminated.
+	push	{r7}
+	.save {r7}
+	.setfp r7, sp, #0
+	add	r7, sp, #0
+.L3:
+	nop
+	b	.L3
+	.fnend
+	.size	run, .-run
+	.global	program_E
+	.data
+	.align	1
+	.type	program_E, %object
+	.size	program_E, 2
+program_E:
+	.space	2
+	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
+	.section	.note.GNU-stack,"",%progbits
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ 
+
+===========================================================
+$ gcc -c -mcpu=cortex-m7 -mthumb program.adb
+===========================================================
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m7 -mthumb program.adb
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m7 -mthumb program.adb
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ ls -al
+total 36
+drwxrwxr-x 2 wruslan wruslan 4096 Jan  6 22:08 .
+drwxrwxr-x 8 wruslan wruslan 4096 Jan  6 22:02 ..
+-rw-rw-r-- 1 wruslan wruslan 2220 Jan  6 22:08 chapter-03-test-m7.txt
+-rw-r--r-- 1 wruslan wruslan  218 Mar 12  2016 flash.ld
+-rw-r--r-- 1 wruslan wruslan  122 Mar  4  2016 program.adb
+-rw-r--r-- 1 wruslan wruslan   86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan  442 Jan  6 22:08 program.ali
+-rw-rw-r-- 1 wruslan wruslan 1120 Jan  6 22:08 program.o
+-rw-rw-r-- 1 wruslan wruslan  773 Jan  6 22:02 program.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ 
+
+===========================================================
+$ nm program.o
+===========================================================
+$ arm-linux-gnueabi-nm program.o
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ arm-linux-gnueabi-nm program.o
+         U __aeabi_unwind_cpp_pr0
+00000000 D program_E
+00000000 T run
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ 
+
+===========================================================
+$ ld -T flash.ld -o program.elf program.o
+===========================================================
+$ arm-linux-gnueabi-ld -T flash.ld -o program.elf program.o
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ arm-linux-gnueabi-ld -T flash.ld -o program.elf program.o
+arm-linux-gnueabi-ld: program.o:(.ARM.exidx+0x0): undefined reference to `__aeabi_unwind_cpp_pr0'
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ arm-linux-gnueabihf-ld -T flash.ld -o program.elf program.o
+arm-linux-gnueabihf-ld: program.o:(.ARM.exidx+0x0): undefined reference to `__aeabi_unwind_cpp_pr0'
+
+TO SOLVE THIS PROBLEM
+===============================
+$ arm-linux-gnueabi-ld.gold -T flash.ld -o program.elf program.o
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ arm-linux-gnueabi-ld.gold -T flash.ld -o program.elf program.o
+program.o(.ARM.exidx+0x0): error: undefined reference to '__aeabi_unwind_cpp_pr0'
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ arm-linux-gnueabihf-ld.gold -T flash.ld -o program.elf program.o
+program.o(.ARM.exidx+0x0): error: undefined reference to '__aeabi_unwind_cpp_pr0'
+
+
+
+
+
+===========================================================
+$ nm program.elf
+===========================================================
+
+
+===========================================================
+$ objcopy -O binary program.elf program.bin
+===========================================================
+
+
+
+
+===========================================================
+ALHAMDULILLAH 3 TIMES WRY.
+===========================================================
+

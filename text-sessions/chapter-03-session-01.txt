@@ -81,6 +81,83 @@ Ub2004-rt38:~/github/ada-embedded$
 ===========================================================
 PROBLEM ABOVE SOLVED BELOW in test-codes-01.
 ===========================================================
+===========================================================
+IDENTIFIED ARM COMPILER 
+arm-linux-gnueabi-gnatgcc -> arm-linux-gnueabi-gcc-9
+
+===========================================================
+TEST ARM-ELF COMPILATION (SUCCESS)
+===========================================================
+The -S parameter below tells the compiler to prepare the assembly output 
+instead of an object file. 
+
+The -mcpu and -mthumb options are needed to limit the set of instructions 
+to those understood by the target microcontroller - in the first variant
+below, the Cortex-M0 chip was selected, which does not support floating-point 
+instructions, and the second variant will be used for Cortex-M3 or better. 
+
+When working with a specific chip, it makes sense to use values that 
+correspond with the target device - thanks to this, the compiler will be 
+free to use more elaborate instruction sets, leading to executables that 
+are both smaller and faster.
+
+If the command below was executed without errors, a new file (ada_bismillah.s), 
+the assembler codes, should be created in the same directory. 
+
+===========================================================
+Ub2004-rt38:~/github/ada-embedded$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m0 -mthumb -mfloat-abi=soft ada_bismillah.adb
+Ub2004-rt38:~/github/ada-embedded$ 
+Ub2004-rt38:~/github/ada-embedded$ ls -al
+total 28
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:32 .
+drwxrwxr-x 13 wruslan wruslan 4096 Jan  5 11:29 ..
+-rw-rw-r--  1 wruslan wruslan  226 Jan  5 11:39 ada_bismillah.adb
+-rw-rw-r--  1 wruslan wruslan  572 Jan  6 16:32 ada_bismillah.ads
+-rw-rw-r--  1 wruslan wruslan  529 Jan  6 16:32 ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  829 Jan  6 16:32 ada_bismillah.s
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:30 text-sessions
+Ub2004-rt38:~/github/ada-embedded$ mv ada_bismillah.ali m0-ada_bismillah.ali 
+Ub2004-rt38:~/github/ada-embedded$ mv ada_bismillah.s   m0-ada_bismillah.s 
+Ub2004-rt38:~/github/ada-embedded$ 
+
+===========================================================
+Ub2004-rt38:~/github/ada-embedded$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m3 -mthumb ada_bismillah.adb
+Ub2004-rt38:~/github/ada-embedded$ 
+Ub2004-rt38:~/github/ada-embedded$ ls -al
+total 36
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:34 .
+drwxrwxr-x 13 wruslan wruslan 4096 Jan  5 11:29 ..
+-rw-rw-r--  1 wruslan wruslan  226 Jan  5 11:39 ada_bismillah.adb
+-rw-rw-r--  1 wruslan wruslan  572 Jan  6 16:32 ada_bismillah.ads
+-rw-rw-r--  1 wruslan wruslan  528 Jan  6 16:34 ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  852 Jan  6 16:34 ada_bismillah.s
+-rw-rw-r--  1 wruslan wruslan  529 Jan  6 16:32 m0-ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  829 Jan  6 16:32 m0-ada_bismillah.s
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:34 text-sessions
+Ub2004-rt38:~/github/ada-embedded$ mv ada_bismillah.s   m3-ada_bismillah.s 
+Ub2004-rt38:~/github/ada-embedded$ mv ada_bismillah.ali m3-ada_bismillah.ali 
+Ub2004-rt38:~/github/ada-embedded$ 
+
+===========================================================
+Ub2004-rt38:~/github/ada-embedded$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m7 -mthumb ada_bismillah.adb
+Ub2004-rt38:~/github/ada-embedded$ ls -al
+total 44
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:36 .
+drwxrwxr-x 13 wruslan wruslan 4096 Jan  5 11:29 ..
+-rw-rw-r--  1 wruslan wruslan  226 Jan  5 11:39 ada_bismillah.adb
+-rw-rw-r--  1 wruslan wruslan  572 Jan  6 16:32 ada_bismillah.ads
+-rw-rw-r--  1 wruslan wruslan  529 Jan  6 16:36 ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  853 Jan  6 16:36 ada_bismillah.s
+-rw-rw-r--  1 wruslan wruslan  529 Jan  6 16:32 m0-ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  829 Jan  6 16:32 m0-ada_bismillah.s
+-rw-rw-r--  1 wruslan wruslan  528 Jan  6 16:34 m3-ada_bismillah.ali
+-rw-rw-r--  1 wruslan wruslan  852 Jan  6 16:34 m3-ada_bismillah.s
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:36 text-sessions
+Ub2004-rt38:~/github/ada-embedded$ mv ada_bismillah.ali m7-ada_bismillah.ali 
+Ub2004-rt38:~/github/ada-embedded$ mv ada_bismillah.s   m7-ada_bismillah.s 
+Ub2004-rt38:~/github/ada-embedded$ 
+
+===========================================================
 Ub2004-rt38:~/github/ada-embedded$ ls -al
 total 44
 drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:37 .
@@ -93,19 +170,12 @@ drwxrwxr-x 13 wruslan wruslan 4096 Jan  5 11:29 ..
 -rw-rw-r--  1 wruslan wruslan  852 Jan  6 16:34 m3-ada_bismillah.s
 -rw-rw-r--  1 wruslan wruslan  529 Jan  6 16:36 m7-ada_bismillah.ali
 -rw-rw-r--  1 wruslan wruslan  853 Jan  6 16:36 m7-ada_bismillah.s
-drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:44 text-sessions
+drwxrwxr-x  3 wruslan wruslan 4096 Jan  6 16:36 text-sessions
 Ub2004-rt38:~/github/ada-embedded$ 
 
-Ub2004-rt38:~/github/ada-embedded$ cd text-sessions/
-Ub2004-rt38:~/github/ada-embedded/text-sessions$ ls -al
-total 96
-drwxrwxr-x 3 wruslan wruslan  4096 Jan  6 16:44 .
-drwxrwxr-x 3 wruslan wruslan  4096 Jan  6 16:37 ..
--rw-rw-r-- 1 wruslan wruslan  6036 Jan  6 16:44 chapter-03-session-01.txt
-drwxrwxr-x 2 wruslan wruslan  4096 Jan  6 16:07 screenshots-synaptic-install
--rw-r--r-- 1 wruslan wruslan 32806 Jan  6 16:30 session-ubuntu-18.04-install-gnat-eabi-arm-elf.txt
--rw-rw-r-- 1 wruslan wruslan 38193 Jan  6 16:41 session-ubuntu-20.04-install-gnat-eabi-arm-elf.txt
-Ub2004-rt38:~/github/ada-embedded/text-sessions$ 
+===========================================================
+DISPLAY ASSEMBLER CODES (xxx.s) ABOVE.
+===========================================================
 
 ===========================================================
 ALHAMDULILLAH 3 TIMES WRY.

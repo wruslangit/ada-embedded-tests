@@ -1,0 +1,125 @@
+File: chapter-03-session-02.txt
+Date: Wed 06 Jan 2021 08:43:09 PM +08
+Author: WRY wruslandr@gmail.com
+
+The "gcc" ==> IDENTIFIED FOR ARM COMPILER 
+arm-linux-gnueabi-gnatgcc -> arm-linux-gnueabi-gcc-9
+
+INSIDE DIRECTORY 
+Ub2004-rt38:~/github//test-codes-02$
+
+===========================================================
+COMPILATION
+Let's try to compile the same program to create an object file:
+===========================================================
+Ub2004-rt38:~/github//test-codes-02$ ls -al
+total 16
+drwxrwxr-x 2 wruslan wruslan 4096 Jan  6 20:44 .
+drwxrwxr-x 7 wruslan wruslan 4096 Jan  6 20:44 ..
+-rw-rw-r-- 1 wruslan wruslan  681 Jan  6 18:40 ada_bismillah.adb
+-rw-rw-r-- 1 wruslan wruslan  572 Jan  6 16:32 ada_bismillah.ads
+Ub2004-rt38:~/github//test-codes-02$ 
+
+Ub2004-rt38:~/github//test-codes-02$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m0 -mthumb -mfloat-abi=soft ada_bismillah.adb
+Ub2004-rt38:~/github//test-codes-02$ mv ada_bismillah.o m0-ada_bismillah.o
+Ub2004-rt38:~/github//test-codes-02$ 
+Ub2004-rt38:~/github//test-codes-02$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb ada_bismillah.adb
+Ub2004-rt38:~/github//test-codes-02$ mv ada_bismillah.o m3-ada_bismillah.o
+Ub2004-rt38:~/github//test-codes-02$ 
+Ub2004-rt38:~/github//test-codes-02$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m7 -mthumb ada_bismillah.adb
+Ub2004-rt38:~/github//test-codes-02$ mv ada_bismillah.o m7-ada_bismillah.o
+Ub2004-rt38:~/github//test-codes-02$ 
+
+===========================================================
+Ub2004-rt38:~/github//test-codes-02$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m7 -mthumb ada_bismillah.adb
+Ub2004-rt38:~/github//test-codes-02$ ls -al
+total 36
+drwxrwxr-x 2 wruslan wruslan 4096 Jan  6 20:52 .
+drwxrwxr-x 7 wruslan wruslan 4096 Jan  6 20:44 ..
+-rw-rw-r-- 1 wruslan wruslan  681 Jan  6 18:40 ada_bismillah.adb
+-rw-rw-r-- 1 wruslan wruslan  572 Jan  6 16:32 ada_bismillah.ads
+-rw-rw-r-- 1 wruslan wruslan 2028 Jan  6 20:52 ada_bismillah.ali
+-rw-rw-r-- 1 wruslan wruslan 1460 Jan  6 20:52 ada_bismillah.o
+-rw-rw-r-- 1 wruslan wruslan 1464 Jan  6 20:50 m0-ada_bismillah.o
+-rw-rw-r-- 1 wruslan wruslan 1460 Jan  6 20:51 m3-ada_bismillah.o
+-rw-rw-r-- 1 wruslan wruslan 1460 Jan  6 20:51 m7-ada_bismillah.o
+Ub2004-rt38:~/github//test-codes-02$ 
+
+===========================================================
+NM - NAME IDENTIFIER (nm - list symbols from object files)
+===========================================================
+The result is a binary file. We can check the list of all symbols used in 
+this file with this command
+
+Ub2004-rt38:~/github//test-codes-02$ nm m0-ada_bismillah.o 
+00000000 r $d
+00000030 t $d
+00000000 r $d
+00000000 r $d
+00000000 d $d
+00000000 t $t
+00000000 D ada_bismillah_E
+         U ada__text_io__put_line__2
+         U __aeabi_unwind_cpp_pr1
+00000001 T run_bismillah
+Ub2004-rt38:~/github//test-codes-02$ 
+
+Ub2004-rt38:~/github//test-codes-02$ nm m3-ada_bismillah.o 
+00000000 r $d
+0000002c t $d
+00000000 r $d
+00000000 r $d
+00000000 d $d
+00000000 t $t
+00000000 D ada_bismillah_E
+         U ada__text_io__put_line__2
+         U __aeabi_unwind_cpp_pr1
+00000001 T run_bismillah
+Ub2004-rt38:~/github//test-codes-02$ 
+
+Ub2004-rt38:~/github//test-codes-02$ nm m7-ada_bismillah.o 
+00000000 r $d
+0000002c t $d
+00000000 r $d
+00000000 r $d
+00000000 d $d
+00000000 t $t
+00000000 D ada_bismillah_E
+         U ada__text_io__put_line__2
+         U __aeabi_unwind_cpp_pr1
+00000001 T run_bismillah
+Ub2004-rt38:~/github//test-codes-02$ 
+
+===========================================================
+MAKE EXECUTABLE FILE (ELF)
+===========================================================
+Now, we can try to link our program into an executable file. The linking 
+process will be controlled by a very short linker script, which I will explain
+in the next chapter - here, in order not to lose the flow (and assuming 
+Arduino M0 as a target), let's invoke the linker with this command:
+
+WHICH ld EQUIVALENT
+===========================
+arm-linux-gnueabi-ld -> arm-linux-gnueabi-ld.bfd
+arm-linux-gnueabihf-ld -> arm-linux-gnueabihf-ld.bfd
+
+$ ld -T flash.ld -o ada_bismillah.elf ada_bismillah.o
+
+===========================
+Ub2004-rt38:~/github/embedded-ada-tests/test-codes-02$ ld -T flash.ld -o ada_bismillah.elf ada_bismillah.o
+ld: cannot open linker script file flash.ld: No such file or directory
+Ub2004-rt38:~/github/embedded-ada-tests/test-codes-02$ locate flash.ld
+
+==========================
+Ub2004-rt38:~/github/embedded-ada-tests/test-codes-02$ arm-linux-gnueabi-ld -T flash.ld -o ada_bismillah.elf ada_bismillah.o
+arm-linux-gnueabi-ld: cannot open linker script file flash.ld: No such file or directory
+Ub2004-rt38:~/github/embedded-ada-tests/test-codes-02$ 
+
+cp /home/wruslan/github/ada-ArmCortexM7/codes-gnat-cortex/ada-on-cortex/Nucleo144/03_First_Program/flash.ld ./
+
+
+
+===========================================================
+ALHAMDULILLAH 3 TIMES WRY.
+===========================================================
+
