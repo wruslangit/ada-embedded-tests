@@ -1,0 +1,143 @@
+File: ARM-ELF-equivalents-to-GCC.txt
+Date: Thu 07 Jan 2021 12:11:22 PM +08
+Author: WRY wruslandr@gmail.com
+
+===========================================================
+GCC EQUIVALENTS FOR GNAT-ARM-ELF
+===========================================================
+gcc     ==> arm-linux-gnueabi-gnatgcc
+nm      ==> arm-linux-gnueabi-nm
+ld      ==> arm-linux-gnueabi-ld
+objcopy ==> arm-linux-gnueabi-objcopy
+
+===========================================================
+APP VERSIONS FOR GNAT-ARM-ELF
+===========================================================
+Ub2004-rt38:~$ arm-linux-gnueabi-gnatgcc --version
+arm-linux-gnueabi-gnatgcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0
+
+Ub2004-rt38:~$ arm-linux-gnueabi-nm --version
+GNU nm (GNU Binutils for Ubuntu) 2.34
+
+Ub2004-rt38:~$ arm-linux-gnueabi-ld --version
+GNU ld (GNU Binutils for Ubuntu) 2.34
+
+Ub2004-rt38:~$ arm-linux-gnueabi-objcopy --version
+GNU objcopy (GNU Binutils for Ubuntu) 2.34
+
+===========================================================
+LOCATE INSIDE /usr/bin FOR arm-linux-gnueabi
+===========================================================
+Ub2004-rt38:~$ ls -al /usr/bin | grep arm-linux-gnueabi
+-rwxr-xr-x  1 root   root          35536 Apr  7  2020 arm-linux-gnueabi-addr2line
+-rwxr-xr-x  1 root   root          72120 Apr  7  2020 arm-linux-gnueabi-ar
+-rwxr-xr-x  1 root   root        1064072 Apr  7  2020 arm-linux-gnueabi-as
+-rwxr-xr-x  1 root   root          30992 Apr  7  2020 arm-linux-gnueabi-c++filt
+-rwxr-xr-x  1 root   root        1277136 Sep 16 20:33 arm-linux-gnueabi-cpp-9
+-rwxr-xr-x  1 root   root        2607736 Apr  7  2020 arm-linux-gnueabi-dwp
+-rwxr-xr-x  1 root   root          43696 Apr  7  2020 arm-linux-gnueabi-elfedit
+-rwxr-xr-x  1 root   root        1277136 Sep 16 20:33 arm-linux-gnueabi-gcc-9
+-rwxr-xr-x  1 root   root          35472 Sep 16 20:33 arm-linux-gnueabi-gcc-ar-9
+-rwxr-xr-x  1 root   root          35472 Sep 16 20:33 arm-linux-gnueabi-gcc-nm-9
+-rwxr-xr-x  1 root   root          35472 Sep 16 20:33 arm-linux-gnueabi-gcc-ranlib-9
+-rwxr-xr-x  1 root   root         680176 Sep 16 20:33 arm-linux-gnueabi-gcov-9
+-rwxr-xr-x  1 root   root         540808 Sep 16 20:33 arm-linux-gnueabi-gcov-dump-9
+-rwxr-xr-x  1 root   root         565448 Sep 16 20:33 arm-linux-gnueabi-gcov-tool-9
+lrwxrwxrwx  1 root   root             24 Sep 16 20:33 arm-linux-gnueabi-gnat -> arm-linux-gnueabi-gnat-9
+-rwxr-xr-x  1 root   root        1369416 Sep 16 20:33 arm-linux-gnueabi-gnat-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatbind -> arm-linux-gnueabi-gnatbind-9
+-rwxr-xr-x  1 root   root        2135856 Sep 16 20:33 arm-linux-gnueabi-gnatbind-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatchop -> arm-linux-gnueabi-gnatchop-9
+-rwxr-xr-x  1 root   root        1669240 Sep 16 20:33 arm-linux-gnueabi-gnatchop-9
+lrwxrwxrwx  1 root   root             29 Sep 16 20:33 arm-linux-gnueabi-gnatclean -> arm-linux-gnueabi-gnatclean-9
+-rwxr-xr-x  1 root   root        2313552 Sep 16 20:33 arm-linux-gnueabi-gnatclean-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatfind -> arm-linux-gnueabi-gnatfind-9
+-rwxr-xr-x  1 root   root        1636488 Sep 16 20:33 arm-linux-gnueabi-gnatfind-9
+lrwxrwxrwx  1 root   root             23 Sep 16 20:33 arm-linux-gnueabi-gnatgcc -> arm-linux-gnueabi-gcc-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnathtml -> arm-linux-gnueabi-gnathtml-9
+-rwxr-xr-x  1 root   root          32139 Sep 16 20:33 arm-linux-gnueabi-gnathtml-9
+lrwxrwxrwx  1 root   root             26 Sep 16 20:33 arm-linux-gnueabi-gnatkr -> arm-linux-gnueabi-gnatkr-9
+-rwxr-xr-x  1 root   root        1315784 Sep 16 20:33 arm-linux-gnueabi-gnatkr-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatlink -> arm-linux-gnueabi-gnatlink-9
+-rwxr-xr-x  1 root   root        1459840 Sep 16 20:33 arm-linux-gnueabi-gnatlink-9
+lrwxrwxrwx  1 root   root             26 Sep 16 20:33 arm-linux-gnueabi-gnatls -> arm-linux-gnueabi-gnatls-9
+-rwxr-xr-x  1 root   root        2506352 Sep 16 20:33 arm-linux-gnueabi-gnatls-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatmake -> arm-linux-gnueabi-gnatmake-9
+-rwxr-xr-x  1 root   root        2662904 Sep 16 20:33 arm-linux-gnueabi-gnatmake-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatname -> arm-linux-gnueabi-gnatname-9
+-rwxr-xr-x  1 root   root        2259792 Sep 16 20:33 arm-linux-gnueabi-gnatname-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatprep -> arm-linux-gnueabi-gnatprep-9
+-rwxr-xr-x  1 root   root        2411792 Sep 16 20:33 arm-linux-gnueabi-gnatprep-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabi-gnatxref -> arm-linux-gnueabi-gnatxref-9
+-rwxr-xr-x  1 root   root        1636488 Sep 16 20:33 arm-linux-gnueabi-gnatxref-9
+-rwxr-xr-x  1 root   root         102280 Apr  7  2020 arm-linux-gnueabi-gprof
+-rwxr-xr-x  1 root   root          35536 Apr  7  2020 arm-linux-gnueabihf-addr2line
+-rwxr-xr-x  1 root   root          72120 Apr  7  2020 arm-linux-gnueabihf-ar
+-rwxr-xr-x  1 root   root        1064072 Apr  7  2020 arm-linux-gnueabihf-as
+-rwxr-xr-x  1 root   root          30992 Apr  7  2020 arm-linux-gnueabihf-c++filt
+-rwxr-xr-x  1 root   root        1277136 Sep 16 20:33 arm-linux-gnueabihf-cpp-9
+-rwxr-xr-x  1 root   root        2607736 Apr  7  2020 arm-linux-gnueabihf-dwp
+-rwxr-xr-x  1 root   root          43696 Apr  7  2020 arm-linux-gnueabihf-elfedit
+-rwxr-xr-x  1 root   root        1277136 Sep 16 20:33 arm-linux-gnueabihf-gcc-9
+-rwxr-xr-x  1 root   root          35472 Sep 16 20:33 arm-linux-gnueabihf-gcc-ar-9
+-rwxr-xr-x  1 root   root          35472 Sep 16 20:33 arm-linux-gnueabihf-gcc-nm-9
+-rwxr-xr-x  1 root   root          35472 Sep 16 20:33 arm-linux-gnueabihf-gcc-ranlib-9
+-rwxr-xr-x  1 root   root         680176 Sep 16 20:33 arm-linux-gnueabihf-gcov-9
+-rwxr-xr-x  1 root   root         540808 Sep 16 20:33 arm-linux-gnueabihf-gcov-dump-9
+-rwxr-xr-x  1 root   root         565448 Sep 16 20:33 arm-linux-gnueabihf-gcov-tool-9
+lrwxrwxrwx  1 root   root             26 Sep 16 20:33 arm-linux-gnueabihf-gnat -> arm-linux-gnueabihf-gnat-9
+-rwxr-xr-x  1 root   root        1369416 Sep 16 20:33 arm-linux-gnueabihf-gnat-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatbind -> arm-linux-gnueabihf-gnatbind-9
+-rwxr-xr-x  1 root   root        2135856 Sep 16 20:33 arm-linux-gnueabihf-gnatbind-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatchop -> arm-linux-gnueabihf-gnatchop-9
+-rwxr-xr-x  1 root   root        1669240 Sep 16 20:33 arm-linux-gnueabihf-gnatchop-9
+lrwxrwxrwx  1 root   root             31 Sep 16 20:33 arm-linux-gnueabihf-gnatclean -> arm-linux-gnueabihf-gnatclean-9
+-rwxr-xr-x  1 root   root        2313552 Sep 16 20:33 arm-linux-gnueabihf-gnatclean-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatfind -> arm-linux-gnueabihf-gnatfind-9
+-rwxr-xr-x  1 root   root        1636488 Sep 16 20:33 arm-linux-gnueabihf-gnatfind-9
+lrwxrwxrwx  1 root   root             25 Sep 16 20:33 arm-linux-gnueabihf-gnatgcc -> arm-linux-gnueabihf-gcc-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnathtml -> arm-linux-gnueabihf-gnathtml-9
+-rwxr-xr-x  1 root   root          32139 Sep 16 20:33 arm-linux-gnueabihf-gnathtml-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabihf-gnatkr -> arm-linux-gnueabihf-gnatkr-9
+-rwxr-xr-x  1 root   root        1315784 Sep 16 20:33 arm-linux-gnueabihf-gnatkr-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatlink -> arm-linux-gnueabihf-gnatlink-9
+-rwxr-xr-x  1 root   root        1459840 Sep 16 20:33 arm-linux-gnueabihf-gnatlink-9
+lrwxrwxrwx  1 root   root             28 Sep 16 20:33 arm-linux-gnueabihf-gnatls -> arm-linux-gnueabihf-gnatls-9
+-rwxr-xr-x  1 root   root        2506352 Sep 16 20:33 arm-linux-gnueabihf-gnatls-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatmake -> arm-linux-gnueabihf-gnatmake-9
+-rwxr-xr-x  1 root   root        2662904 Sep 16 20:33 arm-linux-gnueabihf-gnatmake-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatname -> arm-linux-gnueabihf-gnatname-9
+-rwxr-xr-x  1 root   root        2259792 Sep 16 20:33 arm-linux-gnueabihf-gnatname-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatprep -> arm-linux-gnueabihf-gnatprep-9
+-rwxr-xr-x  1 root   root        2411792 Sep 16 20:33 arm-linux-gnueabihf-gnatprep-9
+lrwxrwxrwx  1 root   root             30 Sep 16 20:33 arm-linux-gnueabihf-gnatxref -> arm-linux-gnueabihf-gnatxref-9
+-rwxr-xr-x  1 root   root        1636488 Sep 16 20:33 arm-linux-gnueabihf-gnatxref-9
+-rwxr-xr-x  1 root   root         102280 Apr  7  2020 arm-linux-gnueabihf-gprof
+lrwxrwxrwx  1 root   root             26 Apr  7  2020 arm-linux-gnueabihf-ld -> arm-linux-gnueabihf-ld.bfd
+-rwxr-xr-x  1 root   root         761536 Apr  7  2020 arm-linux-gnueabihf-ld.bfd
+-rwxr-xr-x  1 root   root        5234384 Apr  7  2020 arm-linux-gnueabihf-ld.gold
+-rwxr-xr-x  1 root   root          52664 Apr  7  2020 arm-linux-gnueabihf-nm
+-rwxr-xr-x  1 root   root         186856 Apr  7  2020 arm-linux-gnueabihf-objcopy
+-rwxr-xr-x  1 root   root         402256 Apr  7  2020 arm-linux-gnueabihf-objdump
+-rwxr-xr-x  1 root   root          72152 Apr  7  2020 arm-linux-gnueabihf-ranlib
+-rwxr-xr-x  1 root   root         658360 Apr  7  2020 arm-linux-gnueabihf-readelf
+-rwxr-xr-x  1 root   root          35280 Apr  7  2020 arm-linux-gnueabihf-size
+-rwxr-xr-x  1 root   root          35488 Apr  7  2020 arm-linux-gnueabihf-strings
+-rwxr-xr-x  1 root   root         186856 Apr  7  2020 arm-linux-gnueabihf-strip
+lrwxrwxrwx  1 root   root             24 Apr  7  2020 arm-linux-gnueabi-ld -> arm-linux-gnueabi-ld.bfd
+-rwxr-xr-x  1 root   root         761536 Apr  7  2020 arm-linux-gnueabi-ld.bfd
+-rwxr-xr-x  1 root   root        5234384 Apr  7  2020 arm-linux-gnueabi-ld.gold
+-rwxr-xr-x  1 root   root          52664 Apr  7  2020 arm-linux-gnueabi-nm
+-rwxr-xr-x  1 root   root         186856 Apr  7  2020 arm-linux-gnueabi-objcopy
+-rwxr-xr-x  1 root   root         402256 Apr  7  2020 arm-linux-gnueabi-objdump
+-rwxr-xr-x  1 root   root          72152 Apr  7  2020 arm-linux-gnueabi-ranlib
+-rwxr-xr-x  1 root   root         658360 Apr  7  2020 arm-linux-gnueabi-readelf
+-rwxr-xr-x  1 root   root          35280 Apr  7  2020 arm-linux-gnueabi-size
+-rwxr-xr-x  1 root   root          35488 Apr  7  2020 arm-linux-gnueabi-strings
+-rwxr-xr-x  1 root   root         186856 Apr  7  2020 arm-linux-gnueabi-strip
+Ub2004-rt38:~$ 
+
+===========================================================
+ALHAMDULILLAH 3 TIMES WRY.
+===========================================================
+

@@ -1,5 +1,5 @@
-File: chapter-03-test-m0.txt
-Date: Thu 07 Jan 2021 11:00:08 AM +08
+File: chapter-03-test-m3.txt
+Date: Thu 07 Jan 2021 11:47:42 AM +08
 Author: WRY wruslandr@gmail.com
 
 ===========================================================
@@ -28,17 +28,18 @@ GNU objcopy (GNU Binutils for Ubuntu) 2.34
 ===========================================================
 STARTING FILES
 ===========================================================
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ ls -al
-total 28
-drwxrwxr-x  2 wruslan wruslan 4096 Jan  6 22:46 .
-drwxrwxr-x 10 wruslan wruslan 4096 Jan  6 22:45 ..
--rw-rw-r--  1 wruslan wruslan 5201 Jan  6 22:46 chapter-03-test-m0.txt
--rw-r--r--  1 wruslan wruslan  218 Mar 12  2016 flash.ld
--rw-r--r--  1 wruslan wruslan  122 Mar  4  2016 program.adb
--rw-r--r--  1 wruslan wruslan   86 Mar  4  2016 program.ads
--rw-rw-r--  1 wruslan wruslan   40 Jan  7 10:03 wr_unwind.c
--rw-rw-r--  1 wruslan wruslan   36 Jan  7 10:03 wr_unwind.h
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+Ub2004-rt38:~/github/embedded-ada-tests$ cd test-m3-codes/
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 44
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:09 .
+drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
+-rw-rw-r--  1 wruslan wruslan 15535 Jan  7 11:09 chapter-03-test-m3.txt
+-rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
+-rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
+-rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
 
 ===========================================================
 SOURCE CODE CONTENTS (5 files)
@@ -90,51 +91,51 @@ void __aeabi_unwind_cpp_pr0(void);
 Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
 
 ===========================================================
-$ gcc -S -mcpu=cortex-m0 -mthumb -mfloat-abi=soft program.adb
+$ gcc -S -mcpu=cortex-m3 -mthumb program.adb
 ===========================================================
-$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m0 -mthumb -mfloat-abi=soft program.adb
+$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m3 -mthumb program.adb
 
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m0 -mthumb -mfloat-abi=soft program.adb
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ ls -al
-total 76
-drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 10:28 .
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m3 -mthumb program.adb
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 52
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:11 .
 drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
--rw-rw-r--  1 wruslan wruslan 13947 Jan  7 10:27 chapter-03-test-m0.txt
+-rw-rw-r--  1 wruslan wruslan 15287 Jan  7 11:11 chapter-03-test-m3.txt
 -rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
 -rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
 -rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
--rw-rw-r--  1 wruslan wruslan   442 Jan  7 10:28 program.ali
--rw-rw-r--  1 wruslan wruslan   749 Jan  7 10:28 program.s   <== THIS ONE
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:11 program.ali
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s    <== THIS ONE
 -rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
 -rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
 
 ===========================================================
-$ gcc -S -mcpu=cortex-m0 -mthumb -mfloat-abi=soft wr_unwind.c
+$ gcc -S -mcpu=cortex-m3 -mthumb wr_unwind.c
 ===========================================================
-$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m0 -mthumb -mfloat-abi=soft wr_unwind.c
+$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m3 -mthumb wr_unwind.c
 
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m0 -mthumb -mfloat-abi=soft wr_unwind.c
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ ls -al
-total 80
-drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 10:28 .
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m3 -mthumb wr_unwind.c
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 56
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:13 .
 drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
--rw-rw-r--  1 wruslan wruslan 13947 Jan  7 10:27 chapter-03-test-m0.txt
+-rw-rw-r--  1 wruslan wruslan 15176 Jan  7 11:13 chapter-03-test-m3.txt
 -rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
 -rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
 -rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
--rw-rw-r--  1 wruslan wruslan   442 Jan  7 10:28 program.ali
--rw-rw-r--  1 wruslan wruslan   749 Jan  7 10:28 program.s
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:11 program.ali
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
 -rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
 -rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
--rw-rw-r--  1 wruslan wruslan   731 Jan  7 10:28 wr_unwind.s  <== THIS ONE
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s  <== THIS ONE
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
 
 ===========================================================
 $ cat program.s
 ===========================================================
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ cat program.s
-	.cpu cortex-m0
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ cat program.s
+	.cpu cortex-m3
 	.eabi_attribute 20, 1
 	.eabi_attribute 21, 1
 	.eabi_attribute 23, 3
@@ -142,14 +143,14 @@ Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ cat program.s
 	.eabi_attribute 25, 1
 	.eabi_attribute 26, 2
 	.eabi_attribute 30, 6
-	.eabi_attribute 34, 0
+	.eabi_attribute 34, 1
 	.file	"program.adb"
 	.text
 	.align	2
 	.global	run
-	.arch armv6s-m
+	.arch armv7-m
 	.syntax unified
-	.code	16
+	.thumb
 	.thumb_func
 	.fpu softvfp
 	.type	run, %function
@@ -158,8 +159,9 @@ run:
 .LFB2:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 1, uses_anonymous_args = 0
-	push	{r7, lr}
-	.save {r7, lr}
+	@ link register save eliminated.
+	push	{r7}
+	.save {r7}
 	.setfp r7, sp, #0
 	add	r7, sp, #0
 .L3:
@@ -176,13 +178,13 @@ program_E:
 	.space	2
 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
 	.section	.note.GNU-stack,"",%progbits
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
 
 ===========================================================
 $ cat wr_unwind.s
 ===========================================================
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ cat wr_unwind.s
-	.cpu cortex-m0
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ cat wr_unwind.s
+	.cpu cortex-m3
 	.eabi_attribute 20, 1
 	.eabi_attribute 21, 1
 	.eabi_attribute 23, 3
@@ -190,83 +192,87 @@ Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ cat wr_unwind.s
 	.eabi_attribute 25, 1
 	.eabi_attribute 26, 2
 	.eabi_attribute 30, 6
-	.eabi_attribute 34, 0
+	.eabi_attribute 34, 1
 	.eabi_attribute 18, 4
 	.file	"wr_unwind.c"
 	.text
 	.align	1
 	.global	__aeabi_unwind_cpp_pr0
-	.arch armv6s-m
+	.arch armv7-m
 	.syntax unified
-	.code	16
+	.thumb
 	.thumb_func
 	.fpu softvfp
 	.type	__aeabi_unwind_cpp_pr0, %function
 __aeabi_unwind_cpp_pr0:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 1, uses_anonymous_args = 0
-	push	{r7, lr}
+	@ link register save eliminated.
+	push	{r7}
 	add	r7, sp, #0
 	nop
 	mov	sp, r7
 	@ sp needed
-	pop	{r7, pc}
+	pop	{r7}
+	bx	lr
 	.size	__aeabi_unwind_cpp_pr0, .-__aeabi_unwind_cpp_pr0
 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
 	.section	.note.GNU-stack,"",%progbits
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
 
+CREATE OBJECT FILE
 ===========================================================
-$ gcc -c -mcpu=cortex-m0 -mthumb -mfloat-abi=soft program.adb
+$ gcc -c -mcpu=cortex-m3 -mthumb program.adb
 ===========================================================
-$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m0 -mthumb -mfloat-abi=soft program.adb
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb program.adb
 
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m0 -mthumb -mfloat-abi=soft program.adb
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ ls -al
-total 80
-drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 10:37 .
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb program.adb
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 60
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:18 .
 drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
--rw-rw-r--  1 wruslan wruslan 16310 Jan  7 10:36 chapter-03-test-m0.txt
+-rw-rw-r--  1 wruslan wruslan 15137 Jan  7 11:17 chapter-03-test-m3.txt
 -rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
 -rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
 -rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
--rw-rw-r--  1 wruslan wruslan   442 Jan  7 10:37 program.ali
--rw-rw-r--  1 wruslan wruslan  1120 Jan  7 10:37 program.o    <== THIS ONE
--rw-rw-r--  1 wruslan wruslan   749 Jan  7 10:28 program.s
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rw-rw-r--  1 wruslan wruslan  1120 Jan  7 11:18 program.o   <== THIS ONE
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
 -rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
 -rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
--rw-rw-r--  1 wruslan wruslan   731 Jan  7 10:28 wr_unwind.s
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
 
+CREATE OBJECT FILE
 ===========================================================
-$ gcc -c -mcpu=cortex-m0 -mthumb -mfloat-abi=soft wr_unwind.c
+$ gcc -c -mcpu=cortex-m3 -mthumb wr_unwind.c
 ===========================================================
-$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m0 -mthumb -mfloat-abi=soft wr_unwind.c
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb wr_unwind.c
 
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m0 -mthumb -mfloat-abi=soft wr_unwind.c
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ ls -al
-total 84
-drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 10:40 .
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb wr_unwind.c
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 64
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:20 .
 drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
--rw-rw-r--  1 wruslan wruslan 16789 Jan  7 10:39 chapter-03-test-m0.txt
+-rw-rw-r--  1 wruslan wruslan 15044 Jan  7 11:20 chapter-03-test-m3.txt
 -rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
 -rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
 -rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
--rw-rw-r--  1 wruslan wruslan   442 Jan  7 10:37 program.ali
--rw-rw-r--  1 wruslan wruslan  1120 Jan  7 10:37 program.o
--rw-rw-r--  1 wruslan wruslan   749 Jan  7 10:28 program.s
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rw-rw-r--  1 wruslan wruslan  1120 Jan  7 11:18 program.o
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
 -rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
 -rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
--rw-rw-r--  1 wruslan wruslan   836 Jan  7 10:40 wr_unwind.o  <== THIS ONE
--rw-rw-r--  1 wruslan wruslan   731 Jan  7 10:28 wr_unwind.s
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+-rw-rw-r--  1 wruslan wruslan   836 Jan  7 11:20 wr_unwind.o  <== THIS ONE
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
 
 ===========================================================
 $ nm program.o
 ===========================================================
 $ arm-linux-gnueabi-nm program.o
 
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-nm program.o
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-nm program.o
          U __aeabi_unwind_cpp_pr0
 00000000 D program_E
 00000000 T run
@@ -276,118 +282,139 @@ $ nm wr_unwind.o
 ===========================================================
 $ arm-linux-gnueabi-nm wr_unwind.o
 
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-nm wr_unwind.o
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-nm wr_unwind.o
 00000000 T __aeabi_unwind_cpp_pr0
 
 ===========================================================
 START FILES TO CREATE ELF
 ===========================================================
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ ls -al
-total 80
-drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 10:48 .
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 64
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:20 .
 drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
--rw-rw-r--  1 wruslan wruslan 13602 Jan  7 10:48 chapter-03-test-m0.txt
+-rw-rw-r--  1 wruslan wruslan 15044 Jan  7 11:20 chapter-03-test-m3.txt
 -rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
 -rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
 -rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
--rw-rw-r--  1 wruslan wruslan   442 Jan  7 10:37 program.ali
--rw-rw-r--  1 wruslan wruslan  1120 Jan  7 10:37 program.o
--rw-rw-r--  1 wruslan wruslan   749 Jan  7 10:28 program.s
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rw-rw-r--  1 wruslan wruslan  1120 Jan  7 11:18 program.o
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
 -rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
 -rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
--rw-rw-r--  1 wruslan wruslan   836 Jan  7 10:40 wr_unwind.o
--rw-rw-r--  1 wruslan wruslan   731 Jan  7 10:28 wr_unwind.s
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+-rw-rw-r--  1 wruslan wruslan   836 Jan  7 11:20 wr_unwind.o
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$
 
-CREATE ELF FILE
+CREATE ELF FILE FROM OBJECT FILES
 ===========================================================
 $ ld -T flash.ld -o program.elf program.o wr_unwind.o
 ===========================================================
 $ arm-linux-gnueabi-ld -T flash.ld -o program.elf program.o wr_unwind.o
 
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-ld -T flash.ld -o program.elf program.o wr_unwind.o
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ ls -al
-total 80
-drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 10:52 .
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-ld -T flash.ld -o program.elf program.o wr_unwind.o
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 72
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:28 .
 drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
--rw-rw-r--  1 wruslan wruslan 13609 Jan  7 10:51 chapter-03-test-m0.txt
+-rw-rw-r--  1 wruslan wruslan 15179 Jan  7 11:27 chapter-03-test-m3.txt
 -rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
 -rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
 -rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
--rw-rw-r--  1 wruslan wruslan   442 Jan  7 10:37 program.ali
--rwxrwxr-x  1 wruslan wruslan 66980 Jan  7 10:52 program.elf   <== THIS ONE
--rw-rw-r--  1 wruslan wruslan  1120 Jan  7 10:37 program.o
--rw-rw-r--  1 wruslan wruslan   749 Jan  7 10:28 program.s
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rwxrwxr-x  1 wruslan wruslan 66984 Jan  7 11:28 program.elf   <== THIS ONE
+-rw-rw-r--  1 wruslan wruslan  1120 Jan  7 11:18 program.o
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
 -rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
 -rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
--rw-rw-r--  1 wruslan wruslan   836 Jan  7 10:40 wr_unwind.o
--rw-rw-r--  1 wruslan wruslan   731 Jan  7 10:28 wr_unwind.s
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+-rw-rw-r--  1 wruslan wruslan   836 Jan  7 11:20 wr_unwind.o
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
 
 ===========================================================
 $ nm program.elf
 ===========================================================
 $ arm-linux-gnueabi-nm program.elf
 
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-nm program.elf
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-nm program.elf
 08000208 T __aeabi_unwind_cpp_pr0
 08000224 D program_E
 08000200 T run
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
 
-CREATE BIN FILE
+CREATE BIN FILE FROM ELF FILE
 ===========================================================
 $ objcopy -O binary program.elf program.bin
 ===========================================================
 $ arm-linux-gnueabi-objcopy -O binary program.elf program.bin
 
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-objcopy -O binary program.elf program.bin
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ ls -al
-total 80
-drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 10:55 .
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-objcopy -O binary program.elf program.bin
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 76
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:32 .
 drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
--rw-rw-r--  1 wruslan wruslan 13653 Jan  7 10:55 chapter-03-test-m0.txt
+-rw-rw-r--  1 wruslan wruslan 15000 Jan  7 11:32 chapter-03-test-m3.txt
 -rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
 -rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
 -rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
--rw-rw-r--  1 wruslan wruslan   442 Jan  7 10:37 program.ali
--rwxrwxr-x  1 wruslan wruslan   550 Jan  7 10:55 program.bin   <== THIS ONE
--rwxrwxr-x  1 wruslan wruslan 66980 Jan  7 10:52 program.elf
--rw-rw-r--  1 wruslan wruslan  1120 Jan  7 10:37 program.o
--rw-rw-r--  1 wruslan wruslan   749 Jan  7 10:28 program.s
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rwxrwxr-x  1 wruslan wruslan   550 Jan  7 11:32 program.bin   <== THIS ONE
+-rwxrwxr-x  1 wruslan wruslan 66984 Jan  7 11:28 program.elf
+-rw-rw-r--  1 wruslan wruslan  1120 Jan  7 11:18 program.o
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
 -rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
 -rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
--rw-rw-r--  1 wruslan wruslan   836 Jan  7 10:40 wr_unwind.o
--rw-rw-r--  1 wruslan wruslan   731 Jan  7 10:28 wr_unwind.s
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+-rw-rw-r--  1 wruslan wruslan   836 Jan  7 11:20 wr_unwind.o
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
 
-CREATE HEX FILE
+CREATE HEX FILE FROM ELF FILE
 ===========================================================
 $ objcopy -O ihex program.elf program.hex
 ===========================================================
 $ arm-linux-gnueabi-objcopy -O ihex program.elf program.hex
 
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ arm-linux-gnueabi-objcopy -O ihex program.elf program.hex
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ ls -al
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-objcopy -O ihex program.elf program.hex
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
 total 80
-drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 10:57 .
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:34 .
 drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
--rw-rw-r--  1 wruslan wruslan 13671 Jan  7 10:57 chapter-03-test-m0.txt
+-rw-rw-r--  1 wruslan wruslan 14983 Jan  7 11:34 chapter-03-test-m3.txt
 -rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
 -rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
 -rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
--rw-rw-r--  1 wruslan wruslan   442 Jan  7 10:37 program.ali
--rwxrwxr-x  1 wruslan wruslan   550 Jan  7 10:55 program.bin
--rwxrwxr-x  1 wruslan wruslan 66980 Jan  7 10:52 program.elf
--rw-rw-r--  1 wruslan wruslan   204 Jan  7 10:57 program.hex   <== THIS ONE
--rw-rw-r--  1 wruslan wruslan  1120 Jan  7 10:37 program.o
--rw-rw-r--  1 wruslan wruslan   749 Jan  7 10:28 program.s
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rwxrwxr-x  1 wruslan wruslan   550 Jan  7 11:32 program.bin
+-rwxrwxr-x  1 wruslan wruslan 66984 Jan  7 11:28 program.elf
+-rw-rw-r--  1 wruslan wruslan   208 Jan  7 11:34 program.hex  <== THIS ONE
+-rw-rw-r--  1 wruslan wruslan  1120 Jan  7 11:18 program.o
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
 -rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
 -rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
--rw-rw-r--  1 wruslan wruslan   836 Jan  7 10:40 wr_unwind.o
--rw-rw-r--  1 wruslan wruslan   731 Jan  7 10:28 wr_unwind.s
-Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+-rw-rw-r--  1 wruslan wruslan   836 Jan  7 11:20 wr_unwind.o
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
 
-Note: It is the HEX file that is downloaded to the ARM-Cortex-M0 embedded board.
+===========================================================
+Note: It is the HEX file that is downloaded to the ARM-Cortex-M3 embedded board (Arduino Due).
+
+Now we can use the GUI wxHexEditor or /usr/bin/hexedit to view this hex file. Ha ha ha.
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ hexedit wr_unwind.o
+
+[1]+  Stopped                 hexedit wr_unwind.o
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ hexedit program.o
+
+[2]+  Stopped                 hexedit program.o
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ hexedit program.elf
+
+[3]+  Stopped                 hexedit program.elf
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ hexedit program.bin
+
+[4]+  Stopped                 hexedit program.bin
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ hexedit program.hex
+
+[5]+  Stopped                 hexedit program.hex
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
 
 ===========================================================
 ALHAMDULILLAH 3 TIMES WRY.

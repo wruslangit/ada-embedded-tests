@@ -6,7 +6,7 @@ SECTIONS
     .vectors 0x08000000 :
     {
         LONG(0x20010000)
-        LONG(run_bismillah + 1)
+        LONG(run + 1)
         FILL(0)
     }
 
