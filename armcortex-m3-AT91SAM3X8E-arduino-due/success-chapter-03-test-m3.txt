@@ -1,0 +1,632 @@
+File: chapter-03-test-m3.txt
+Date: Thu 07 Jan 2021 11:47:42 AM +08
+Author: WRY wruslandr@gmail.com
+
+===========================================================
+GCC EQUIVALENTS FOR GNAT-ARM-ELF
+===========================================================
+gcc     ==> arm-linux-gnueabi-gnatgcc
+nm      ==> arm-linux-gnueabi-nm
+ld      ==> arm-linux-gnueabi-ld
+objcopy ==> arm-linux-gnueabi-objcopy
+
+===========================================================
+APP VERSIONS FOR GNAT-ARM-ELF
+===========================================================
+Ub2004-rt38:~$ arm-linux-gnueabi-gnatgcc --version
+arm-linux-gnueabi-gnatgcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0
+
+Ub2004-rt38:~$ arm-linux-gnueabi-nm --version
+GNU nm (GNU Binutils for Ubuntu) 2.34
+
+Ub2004-rt38:~$ arm-linux-gnueabi-ld --version
+GNU ld (GNU Binutils for Ubuntu) 2.34
+
+Ub2004-rt38:~$ arm-linux-gnueabi-objcopy --version
+GNU objcopy (GNU Binutils for Ubuntu) 2.34
+
+===========================================================
+STARTING FILES
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests$ cd test-m3-codes/
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 44
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:09 .
+drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
+-rw-rw-r--  1 wruslan wruslan 15535 Jan  7 11:09 chapter-03-test-m3.txt
+-rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
+-rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
+-rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
+
+===========================================================
+SOURCE CODE CONTENTS (5 files)
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ cat flash.ld 
+OUTPUT_FORMAT("elf32-littlearm")
+OUTPUT_ARCH(arm)
+
+SECTIONS
+{
+    .vectors 0x08000000 :
+    {
+        LONG(0x20010000)
+        LONG(run + 1)
+        FILL(0)
+    }
+
+    .text 0x08000200 :
+    {
+        *(.text)
+    }
+}
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ cat program.adb
+package body Program is
+
+   procedure Run is
+   begin
+      loop
+         null;
+      end loop;
+   end Run;
+
+end Program;
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ cat program.ads
+package Program is
+
+   procedure Run;
+   pragma Export (C, Run, "run");
+
+end Program;
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ cat wr_unwind.c
+void __aeabi_unwind_cpp_pr0(void)
+{
+};
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ cat wr_unwind.h
+void __aeabi_unwind_cpp_pr0(void);
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ 
+
+===========================================================
+$ gcc -S -mcpu=cortex-m3 -mthumb program.adb
+===========================================================
+$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m3 -mthumb program.adb
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m3 -mthumb program.adb
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 52
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:11 .
+drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
+-rw-rw-r--  1 wruslan wruslan 15287 Jan  7 11:11 chapter-03-test-m3.txt
+-rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
+-rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
+-rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:11 program.ali
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s    <== THIS ONE
+-rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
+
+===========================================================
+$ gcc -S -mcpu=cortex-m3 -mthumb wr_unwind.c
+===========================================================
+$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m3 -mthumb wr_unwind.c
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m3 -mthumb wr_unwind.c
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 56
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:13 .
+drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
+-rw-rw-r--  1 wruslan wruslan 15176 Jan  7 11:13 chapter-03-test-m3.txt
+-rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
+-rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
+-rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:11 program.ali
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
+-rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s  <== THIS ONE
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
+
+===========================================================
+$ cat program.s
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ cat program.s
+	.cpu cortex-m3
+	.eabi_attribute 20, 1
+	.eabi_attribute 21, 1
+	.eabi_attribute 23, 3
+	.eabi_attribute 24, 1
+	.eabi_attribute 25, 1
+	.eabi_attribute 26, 2
+	.eabi_attribute 30, 6
+	.eabi_attribute 34, 1
+	.file	"program.adb"
+	.text
+	.align	2
+	.global	run
+	.arch armv7-m
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	run, %function
+run:
+	.fnstart
+.LFB2:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 1, uses_anonymous_args = 0
+	@ link register save eliminated.
+	push	{r7}
+	.save {r7}
+	.setfp r7, sp, #0
+	add	r7, sp, #0
+.L3:
+	nop
+	b	.L3
+	.fnend
+	.size	run, .-run
+	.global	program_E
+	.data
+	.align	1
+	.type	program_E, %object
+	.size	program_E, 2
+program_E:
+	.space	2
+	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
+	.section	.note.GNU-stack,"",%progbits
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
+
+===========================================================
+$ cat wr_unwind.s
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ cat wr_unwind.s
+	.cpu cortex-m3
+	.eabi_attribute 20, 1
+	.eabi_attribute 21, 1
+	.eabi_attribute 23, 3
+	.eabi_attribute 24, 1
+	.eabi_attribute 25, 1
+	.eabi_attribute 26, 2
+	.eabi_attribute 30, 6
+	.eabi_attribute 34, 1
+	.eabi_attribute 18, 4
+	.file	"wr_unwind.c"
+	.text
+	.align	1
+	.global	__aeabi_unwind_cpp_pr0
+	.arch armv7-m
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	__aeabi_unwind_cpp_pr0, %function
+__aeabi_unwind_cpp_pr0:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 1, uses_anonymous_args = 0
+	@ link register save eliminated.
+	push	{r7}
+	add	r7, sp, #0
+	nop
+	mov	sp, r7
+	@ sp needed
+	pop	{r7}
+	bx	lr
+	.size	__aeabi_unwind_cpp_pr0, .-__aeabi_unwind_cpp_pr0
+	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
+	.section	.note.GNU-stack,"",%progbits
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
+
+CREATE OBJECT FILE
+===========================================================
+$ gcc -c -mcpu=cortex-m3 -mthumb program.adb
+===========================================================
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb program.adb
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb program.adb
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 60
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:18 .
+drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
+-rw-rw-r--  1 wruslan wruslan 15137 Jan  7 11:17 chapter-03-test-m3.txt
+-rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
+-rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
+-rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rw-rw-r--  1 wruslan wruslan  1120 Jan  7 11:18 program.o   <== THIS ONE
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
+-rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
+
+CREATE OBJECT FILE
+===========================================================
+$ gcc -c -mcpu=cortex-m3 -mthumb wr_unwind.c
+===========================================================
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb wr_unwind.c
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb wr_unwind.c
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 64
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:20 .
+drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
+-rw-rw-r--  1 wruslan wruslan 15044 Jan  7 11:20 chapter-03-test-m3.txt
+-rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
+-rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
+-rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rw-rw-r--  1 wruslan wruslan  1120 Jan  7 11:18 program.o
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
+-rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r--  1 wruslan wruslan   836 Jan  7 11:20 wr_unwind.o  <== THIS ONE
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
+
+===========================================================
+$ nm program.o
+===========================================================
+$ arm-linux-gnueabi-nm program.o
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-nm program.o
+         U __aeabi_unwind_cpp_pr0
+00000000 D program_E
+00000000 T run
+
+===========================================================
+$ nm wr_unwind.o
+===========================================================
+$ arm-linux-gnueabi-nm wr_unwind.o
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-nm wr_unwind.o
+00000000 T __aeabi_unwind_cpp_pr0
+
+===========================================================
+START FILES TO CREATE ELF
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 64
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:20 .
+drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
+-rw-rw-r--  1 wruslan wruslan 15044 Jan  7 11:20 chapter-03-test-m3.txt
+-rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
+-rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
+-rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rw-rw-r--  1 wruslan wruslan  1120 Jan  7 11:18 program.o
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
+-rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r--  1 wruslan wruslan   836 Jan  7 11:20 wr_unwind.o
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$
+
+CREATE ELF FILE FROM OBJECT FILES
+===========================================================
+$ ld -T flash.ld -o program.elf program.o wr_unwind.o
+===========================================================
+$ arm-linux-gnueabi-ld -T flash.ld -o program.elf program.o wr_unwind.o
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-ld -T flash.ld -o program.elf program.o wr_unwind.o
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 72
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:28 .
+drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
+-rw-rw-r--  1 wruslan wruslan 15179 Jan  7 11:27 chapter-03-test-m3.txt
+-rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
+-rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
+-rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rwxrwxr-x  1 wruslan wruslan 66984 Jan  7 11:28 program.elf   <== THIS ONE
+-rw-rw-r--  1 wruslan wruslan  1120 Jan  7 11:18 program.o
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
+-rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r--  1 wruslan wruslan   836 Jan  7 11:20 wr_unwind.o
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
+
+===========================================================
+$ nm program.elf
+===========================================================
+$ arm-linux-gnueabi-nm program.elf
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-nm program.elf
+08000208 T __aeabi_unwind_cpp_pr0
+08000224 D program_E
+08000200 T run
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
+
+CREATE BIN FILE FROM ELF FILE
+===========================================================
+$ objcopy -O binary program.elf program.bin
+===========================================================
+$ arm-linux-gnueabi-objcopy -O binary program.elf program.bin
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-objcopy -O binary program.elf program.bin
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 76
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:32 .
+drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
+-rw-rw-r--  1 wruslan wruslan 15000 Jan  7 11:32 chapter-03-test-m3.txt
+-rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
+-rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
+-rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rwxrwxr-x  1 wruslan wruslan   550 Jan  7 11:32 program.bin   <== THIS ONE
+-rwxrwxr-x  1 wruslan wruslan 66984 Jan  7 11:28 program.elf
+-rw-rw-r--  1 wruslan wruslan  1120 Jan  7 11:18 program.o
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
+-rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r--  1 wruslan wruslan   836 Jan  7 11:20 wr_unwind.o
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
+
+CREATE HEX FILE FROM ELF FILE
+===========================================================
+$ objcopy -O ihex program.elf program.hex
+===========================================================
+$ arm-linux-gnueabi-objcopy -O ihex program.elf program.hex
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-objcopy -O ihex program.elf program.hex
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ ls -al
+total 80
+drwxrwxr-x  2 wruslan wruslan  4096 Jan  7 11:34 .
+drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
+-rw-rw-r--  1 wruslan wruslan 14983 Jan  7 11:34 chapter-03-test-m3.txt
+-rw-r--r--  1 wruslan wruslan   218 Mar 12  2016 flash.ld
+-rw-r--r--  1 wruslan wruslan   122 Mar  4  2016 program.adb
+-rw-r--r--  1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r--  1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rwxrwxr-x  1 wruslan wruslan   550 Jan  7 11:32 program.bin
+-rwxrwxr-x  1 wruslan wruslan 66984 Jan  7 11:28 program.elf
+-rw-rw-r--  1 wruslan wruslan   208 Jan  7 11:34 program.hex  <== THIS ONE
+-rw-rw-r--  1 wruslan wruslan  1120 Jan  7 11:18 program.o
+-rw-rw-r--  1 wruslan wruslan   772 Jan  7 11:11 program.s
+-rw-rw-r--  1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r--  1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r--  1 wruslan wruslan   836 Jan  7 11:20 wr_unwind.o
+-rw-rw-r--  1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
+
+===========================================================
+Note: It is the HEX file that is downloaded to the ARM-Cortex-M3 embedded board (Arduino Due).
+
+Now we can use the GUI wxHexEditor or /usr/bin/hexedit to view this hex file. Ha ha ha.
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ hexedit wr_unwind.o
+
+[1]+  Stopped                 hexedit wr_unwind.o
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ hexedit program.o
+
+[2]+  Stopped                 hexedit program.o
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ hexedit program.elf
+
+[3]+  Stopped                 hexedit program.elf
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ hexedit program.bin
+
+[4]+  Stopped                 hexedit program.bin
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ hexedit program.hex
+
+[5]+  Stopped                 hexedit program.hex
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
+
+===========================================================
+ALHAMDULILLAH 3 TIMES WRY.
+===========================================================
+
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ date
+Fri 08 Jan 2021 10:30:41 AM +08
+
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ uname -a
+Linux HPEliteBook8470p-Ub2004-rt38 5.4.66-rt38 
+#1 SMP PREEMPT_RT Sat Sep 26 16:51:59 +08 2020 x86_64 x86_64 x86_64 GNU/Linux
+
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ lsb_release -a
+LSB Version:    core-11.1.0ubuntu2-noarch:security-11.1.0ubuntu2-noarch
+Distributor ID:	Ubuntu
+Description:    Ubuntu 20.04.1 LTS
+Release:        20.04
+Codename:       focal
+===========================================================
+
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ which bossac
+/usr/bin/bossac
+
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ which bossa
+/usr/bin/bossa
+
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ bossa --version
+... <GUI Opens up> ...
+
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ bossac --version
+
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ bossac -h
+Usage: bossac [OPTION...] [FILE]
+Basic Open Source SAM-BA Application (BOSSA) Version 1.9.1
+Flash programmer for Atmel SAM devices.
+Copyright (c) 2011-2018 ShumaTech (http://www.shumatech.com)
+
+Examples:
+  bossac -e -w -v -b image.bin   # Erase flash, write flash with image.bin,
+                                 # verify the write, and set boot from flash
+  bossac -r0x10000 image.bin     # Read 64KB from flash and store in image.bin
+
+Options:
+  -e, --erase           erase the entire flash starting at the offset
+  -w, --write           write FILE to the flash; accelerated when
+                        combined with erase option
+  -r, --read[=SIZE]     read SIZE from flash and store in FILE;
+                        read entire flash if SIZE not specified
+  -v, --verify          verify FILE matches flash contents
+  -o, --offset=OFFSET   start erase/write/read/verify operation at flash OFFSET;
+                        OFFSET must be aligned to a flash page boundary
+  -p, --port=PORT       use serial PORT to communicate to device;
+                        default behavior is to use first serial port
+  -b, --boot[=BOOL]     boot from ROM if BOOL is 0;
+                        boot from FLASH if BOOL is 1 [default];
+                        option is ignored on unsupported devices
+  -c, --bod[=BOOL]      no brownout detection if BOOL is 0;
+                        brownout detection is on if BOOL is 1 [default]
+  -t, --bor[=BOOL]      no brownout reset if BOOL is 0;
+                        brownout reset is on if BOOL is 1 [default]
+  -l, --lock[=REGION]   lock the flash REGION as a comma-separated list;
+                        lock all if not given [default]
+  -u, --unlock[=REGION] unlock the flash REGION as a comma-separated list;
+                        unlock all if not given [default]
+  -s, --security        set the flash security flag
+  -i, --info            display device information
+  -d, --debug           print debug messages
+  -h, --help            display this help text
+  -U, --usb-port[=BOOL] force serial port detection to USB if BOOL is 1 [default]
+                        or to RS-232 if BOOL is 0
+  -R, --reset           reset CPU (if supported)
+  -a, --arduino-erase   erase and reset via Arduino 1200 baud hack
+
+Report bugs to <bugs@shumatech.com>
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ 
+
+Connect the Arduino Due board to the USB port in your computer
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ lsusb
+Bus 002 Device 003: ID 0a5c:21e1 Broadcom Corp. HP Portable SoftSailing
+Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 006 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 005 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 004: ID 1bcf:2888 Sunplus Innovation Technology Inc. HP Universal Camera
+Bus 001 Device 003: ID 138a:003d Validity Sensors, Inc. VFS491
+Bus 001 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 004 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 003 Device 004: ID 2341:003d Arduino SA Arduino Due Prog. Port  <== THIS ONE
+Bus 003 Device 003: ID 046d:c077 Logitech, Inc. M105 Optical Mouse
+Bus 003 Device 002: ID 0424:2514 Microchip Technology, Inc. (formerly SMSC) USB 2.0 Hub
+Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ 
+
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ dmesg
+
+(1) CONNECT TO ARDUINO DUE USB PROGRAMMING PORT
+=================================================
+....
+....
+[ 8634.138289] usb 3-4: new full-speed USB device number 4 using xhci_hcd
+[ 8634.288574] usb 3-4: New USB device found, idVendor=2341, idProduct=003d, bcdDevice= 0.01
+[ 8634.288582] usb 3-4: New USB device strings: Mfr=1, Product=2, SerialNumber=220
+[ 8634.288586] usb 3-4: Product: Arduino Due Prog. Port
+[ 8634.288588] usb 3-4: Manufacturer: Arduino (www.arduino.cc)
+[ 8634.288590] usb 3-4: SerialNumber: 75232303235351C09091
+[ 8634.356613] cdc_acm 3-4:1.0: ttyACM0: USB ACM device        <=== THIS ONE
+[ 8634.357074] usbcore: registered new interface driver cdc_acm
+[ 8634.357076] cdc_acm: USB Abstract Control Model driver for USB modems and ISDN adapters
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ 
+
+(2) CONNECT TO ARDUINO DUE USB NATIVE PORT
+=================================================
+....
+....
+[11025.565187] usb 3-4: new high-speed USB device number 22 using xhci_hcd
+[11025.713948] usb 3-4: New USB device found, idVendor=2341, idProduct=003e, bcdDevice= 1.00
+[11025.713955] usb 3-4: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+[11025.713959] usb 3-4: Product: Arduino Due     
+[11025.713962] usb 3-4: Manufacturer: Arduino LLC
+[11025.715094] cdc_acm 3-4:1.0: ttyACM0: USB ACM device
+[11025.716623] input: Arduino LLC Arduino Due Mouse as /devices/pci0000:00/0000:00:14.0/usb3/3-4/3-4:1.2/0003:2341:003E.0002/input/input25
+[11025.716933] input: Arduino LLC Arduino Due Keyboard as /devices/pci0000:00/0000:00:14.0/usb3/3-4/3-4:1.2/0003:2341:003E.0002/input/input26
+[11025.773486] hid-generic 0003:2341:003E.0002: input,hidraw1: USB HID v1.01 Mouse [Arduino LLC Arduino Due     ] on usb-0000:00:14.0-4/input2
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ 
+
+===========================================================
+
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ ls -al /dev/ | grep ttyAC
+crw-rw----   1 root    dialout 166,   0 Jan  8 10:47 ttyACM0
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ 
+
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ ls -al
+total 88
+drwxrwxr-x 2 wruslan wruslan  4096 Jan  8 10:56 .
+drwxrwxr-x 8 wruslan wruslan  4096 Jan  8 08:59 ..
+-rw-rw-r-- 1 wruslan wruslan 23109 Jan  8 10:56 chapter-03-test-m3.txt
+-rw-r--r-- 1 wruslan wruslan   218 Mar 12  2016 flash.ld
+-rw-r--r-- 1 wruslan wruslan   122 Mar  4  2016 program.adb
+-rw-r--r-- 1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rwxrwxr-x 1 wruslan wruslan   550 Jan  7 11:32 program.bin
+-rwxrwxr-x 1 wruslan wruslan 66984 Jan  7 11:28 program.elf
+-rw-rw-r-- 1 wruslan wruslan   208 Jan  7 11:34 program.hex
+-rw-rw-r-- 1 wruslan wruslan  1120 Jan  7 11:18 program.o
+-rw-rw-r-- 1 wruslan wruslan   772 Jan  7 11:11 program.s
+-rw-rw-r-- 1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r-- 1 wruslan wruslan   836 Jan  7 11:20 wr_unwind.o
+-rw-rw-r-- 1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+
+===========================================================
+FAILED ATTEMPTS TO UPLOAD program.bin USING BOSSAC
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ bossac -p /dev/ttyACM0 -e -w -v -b program.bin -R
+No device found on /dev/ttyACM0
+
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ bossac -e -w -v -b program.bin -R
+No device found on /dev/ttyACM0
+
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ bossac -p tty.usbmodemfa141 -e -w -v -b program.bin -R
+No device found on tty.usbmodemfa141
+
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ bossac -p ttyACM0 -e -w -v -b program.bin -R
+No device found on ttyACM0
+
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ bossac -e -w -v -b program.bin -R
+No device found on /dev/ttyACM0
+
+
+===========================================================
+SOLVED THE COMMAND LINE UPLOAD FOR ARDUINO DUE
+===========================================================
+As you can see ARDUINO IDE is resetting the board by opening the serial 
+at 1200, forcing the bootloader to start. You have to do the same on your
+script befor launching bossac. How this can be done depends on your OS.
+We do this in STEP 1 below.
+
+STEP 1
+=========
+Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ sudo stty --file=/dev/ttyACM0 1200
+
+SOLUTION: https://arduino.stackexchange.com/questions/1160/why-does-command-line-bossa-not-recognize-arduino-due
+
+Swap out the serial device for whatever /dev you are using; 
+in Linux you may have to sudo to get direct access to the device. 
+This is assuming you are in the directory where bossac lives and your .bin 
+file is there too. Adjust to suit your needs. If using the native USB 
+port you should change -U to true
+We do this in STEP 2 below.
+
+STEP 2
+=========
+wruslan@HPEliteBook8470p-Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ sudo bossac -e -w -v -b program.bin
+Erase flash
+
+Done in 0.053 seconds
+Write 550 bytes to flash (3 pages)
+[==============================] 100% (3/3 pages)
+Done in 0.152 seconds
+Verify 550 bytes of flash
+[==============================] 100% (3/3 pages)
+Verify successful
+Done in 0.139 seconds
+Set boot flash true
+wruslan@HPEliteBook8470p-Ub2004-rt38:~/github/embedded-ada-tests/armcortex-m3-AT91SAM3X8E-arduino-due$ 
+
+===========================================================
+ALHAMDULILLAH 3 TIMES WRY.
+===========================================================
+
