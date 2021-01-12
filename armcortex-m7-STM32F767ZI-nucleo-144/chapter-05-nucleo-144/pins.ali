@@ -1,0 +1,38 @@
+V "GNAT Lib v9"
+A -gnatp
+A -mcpu=cortex-m7
+A -mthumb
+A -mfloat-abi=soft
+A -mtls-dialect=gnu
+A -march=armv7e-m
+P ZX
+
+RN
+
+U pins%b		pins.adb		9b69a226 NE OO PK IL
+W registers%s		registers.ads		registers.ali
+
+U pins%s		pins.ads		fb9ce34b EE NE OO PK IL
+
+D pins.ads		20210112023125 fb9ce34b pins%s
+D pins.adb		20210112024731 9d75aef0 pins%b
+D registers.ads		20210112023206 fd80ef9d registers%s
+D system.ads		20200312110721 77e65b42 system%s
+X 1 pins.ads
+5K9*pins 9l5 9e9 2|9b14 48l5 48t9
+6E14*Pin_ID 6e42 7r43 8r35 2|11r43 28r35
+6n26*Pin_11{6E14} 2|17r22 31r22
+6n34*Pin_12{6E14} 2|21r22 38r22
+7U19*Enable_Output 7>34 2|11b19 26l13 26t26
+7e34 Pin{6E14} 2|11b34 16r22
+8U19*Write 8>26 8>43 2|28b19 46l13 46t18
+8e26 Pin{6E14} 2|28b26 30r22
+8b43 State{boolean} 2|28b43 32r28 39r28
+X 3 registers.ads
+8K9*registers 2|7w6 12r18 14r17 14r42 18r25 18r51 22r25 22r51 33r33 35r33
+. 40r33 42r33 3|22e14
+9M14*Word 2|12r28
+11m9*RCC_AHB1ENR{9M14} 2|14m27 14r52
+15m9*GPIOA_MODER{9M14} 2|18m35 18r61 22m35 22r61
+19m9*GPIOA_BSRR{9M14} 2|33m43 35m43 40m43 42m43
+

@@ -1,0 +1,38 @@
+V "GNAT Lib v9"
+A -gnatp
+A -mcpu=cortex-m3
+A -mthumb
+A -mfloat-abi=soft
+A -mtls-dialect=gnu
+A -march=armv7-m
+P ZX
+
+RN
+
+U pins%b		pins.adb		f8d254f8 NE OO PK IL
+W registers%s		registers.ads		registers.ali
+
+U pins%s		pins.ads		fb9ce34b EE NE OO PK IL
+
+D pins.ads		20210112023453 fb9ce34b pins%s
+D pins.adb		20210112025342 9985f68a pins%b
+D registers.ads		20210112022753 9acb4139 registers%s
+D system.ads		20200312110721 77e65b42 system%s
+X 1 pins.ads
+7K9*pins 11l5 11e9 2|9b14 41l5 41t9
+8E14*Pin_ID 8e42 9r43 10r35 2|11r43 23r35
+8n26*Pin_11{8E14} 2|14r22 26r22
+8n34*Pin_12{8E14} 2|17r22 32r22
+9U19*Enable_Output 9>34 2|11b19 21l13 21t26
+9e34 Pin{8E14} 2|11b34 13r22
+10U19*Write 10>26 10>43 2|23b19 39l13 39t18
+10e26 Pin{8E14} 2|23b26 25r22
+10b43 State{boolean} 2|23b43 27r28 33r28
+X 3 registers.ads
+8K9*Registers 2|7w6 15r25 16r25 18r25 19r25 28r33 30r33 34r33 36r33 3|27e14
+9M14*Word
+11m9*PIOD_PER{9M14} 2|15m35 18m35
+15m9*PIOD_OER{9M14} 2|16m35 19m35
+19m9*PIOD_SODR{9M14} 2|28m43 34m43
+23m9*PIOD_CODR{9M14} 2|30m43 36m43
+

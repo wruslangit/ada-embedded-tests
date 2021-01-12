@@ -1,0 +1,808 @@
+File: chapter-05-digital-output.txt
+Date: Sun 10 Jan 2021 01:50:45 PM +08
+Author: WRY wruslandr@gmail.com
+
+DIGITAL OUTPUT (MULTI-PURPOSE PINS)
+===========================================================
+Both Atmel and STM32 microcontrollers are very flexible and offer lots 
+of functionality - in fact, they have more internal functions than can be 
+exposed on their pins at the same time.
+
+For this reason most of the pins are multi-purpose, relying on configurable 
+multiplexing to assign the given physical pin to the given microcontroller 
+function.
+
+Let's focus on two pins on the standard Arduino connector: 11 and 12.
+
+We need to figure out the pin mapping for the given board - that is, how 
+microcontroller pins are traced to the board external connectors. Such 
+mappings can be derived from the schematics published on the Arduino website 
+or from the diagrams delivered as part of the Nucleo packages.
+
+===========================================================
+Arduino Due board (Atmel) ArmCortex-M3
+===========================================================
+From the Arduino board pin mapping documentation page or from the schematics 
+published on the Arduino web site, we can see that pins 11 and 12 on the 
+board correspond to microcontroller's pins PD7 and PD8. 
+
+These are general-purpose I/O lines (GPIO) and are managed by the PIO 
+controller. There are several PIO controllers, but as you can see from 
+section about multiplexing in the microcontroller documentation, pins PD7 and 
+PD8 belong to controller D, also known as PIOD, and can be shared with some 
+other peripheral functionality. 
+
+The PIOD controller manages 10 I/O lines in total in the microcontroller
+variant that is used in Arduino Due (it is the 144-pin package) and the 
+rules for configuration and operation are similar for all of these lines.
+
+The following actions have to be taken in order to control the output state 
+of our chosen pins:
+
+(1) We have to instruct the microcontroller that we do not want alternative 
+peripheral functions and we want the PIO to take over - according to section 
+about I/O peripheral function selection in the Atmel documentation, the 
+register responsible for this is called PIO_PER (PIO Enable Register), 
+and in the case of controller D the full name of the relevant register is 
+PIOD_PER.
+
+(2) We have to instruct the microcontroller that we want to actually drive 
+the output state of the line (otherwise the line could be only used as input) 
+and from section about output control we know that the relevant configuration
+register is PIO_OER (Output Enable Register), or PIOD_OER for controller D.
+
+(3) Once the two steps above are done, we can set the desired output state 
+and from the same section as above we can see that registers responsible for 
+it are PIOD_SODR (Set Output Data Register) and PIOD_CODR (Clear Output Data
+Register).
+
+All of the registers described above have separate bits for each controlled 
+line. These are bits number 7 and 8 in our case.
+
+To summarize, in order to configure the Arduino Due pin 11 for output 
+and set its state to "high" we need to:
+
+(a) write 1 to bit 7 of PIOD_PER (this needs to be done once at initialization time),
+(b) write 1 to bit 7 of PIOD_OER (this also needs to be done once),
+(c) write 1 to bit 7 of PIOD_SODR (this can be repeated any time).
+
+Similarly, to configure Arduino Due pin 12 for output and set its state 
+to "low" we need to:
+
+(d) write 1 to bit 8 of PIOD_PER,
+(e) write 1 to bit 8 of PIOD_OER,
+(f) write 1 to bit 8 of PIOD_CODR
+
+and of course we can write 1 to appropriate bits in PIO_SODR (set) and 
+PIO_CODR (clear) whenever we want to change the output state.
+
+The only missing piece of information is the location of each register and 
+from sections about product mapping and the register summary we know that:
+
+(g) PIOD_PER is located at  0x400E1400,
+(h) PIOD_OER is located at  0x400E1410,
+(i) PIOD_SODR is located at 0x400E1430,
+(j) PIOD_CODR is located at 0x400E1434.
+
+===========================================================
+STM32 Nucleo-144 board (STM) ArmCortex-M7
+===========================================================
+
+The pin mapping documentation for Nucleo boards is part of the package 
+and on the diagram we can see that pins 11 and 12 on the board correspond 
+to microcontroller's pins PA7 and PA6. 
+
+These are called general-purpose I/O lines (GPIO). There are several GPIO 
+ports that group multiple lines and pins PA7 and PA6 belong to port A, and 
+can be shared with some other peripheral functionality, but such sharing 
+is disabled by default after reset - we will benefit from this fact to 
+simplify our own code.
+
+The following actions have to be taken in order to control the output state of 
+our chosen pins:
+
+(1) We have to instruct the microcontroller that we want to use the GPIO 
+peripheral, and that the clock signal has to be delivered to it. Without 
+proper clocking the peripheral would be non-functional. The register that 
+is responsible for controlling clocks for I/O ports is called RCC_AHB1ENR 
+and each I/O port has a dedicated bit in that register - in the case of port A, 
+it is bit 0.
+
+(2) We have to instruct the microcontroller that we want to actually drive 
+the output state of the line (otherwise the line could be only used as input) 
+and from GPIO functional description we know that the relevant configuration 
+register is GPIOx_MODER (Port Mode Register), or GPIOA_MODER for port A.
+
+(3) Once the two steps above are done, we can set the desired output state 
+and from the same section as above we can see that a single register 
+responsible for it is GPIOA_BSRR (Port Bit Set/Reset Register), which has 
+separate bits dedicated to setting the output state to "high" (these are bits
+in the lower half of the register) or "low" (these are in the upper half).
+
+(4) All of the registers described above have separate bits for each 
+controlled line, but they are not consistently numbered. The GPIOx_MODER 
+register uses pairs if bits for each I/O line in the given port, whereas 
+other registers tend to use single bit mappings for each line.
+
+(5) To be exact, in order to configure the Nucleo-144 pin 11 for output and
+set its state to "high" we need to:
+
+(a) write 1 to bit 0 of the RCC_AHB1ENR 
+(this needs to be done once at initialization time),
+
+(b) write 01 into the bit pair 14-15 of GPIOA_MODER, leaving other bits 
+unchanged (this needs to be done once),
+
+(c) write 1 to bit 7 of GPIOA_BSRR (this can be repeated any time).
+
+Similarly, to configure pin 12 for output and set its state to "low" we need to:
+
+(d) write 1 to bit 0 of the RCC_AHB1ENR 
+(this needs to be done once at initialization time),
+
+(e) write 01 into the bit pair 12-13 of GPIOA_MODER, 
+leaving other bits unchanged (this needs to be done once),
+
+(f) write 1 to bit 22 (that is, 6 + 16) of GPIOA_BSRR 
+(this can be repeated any time)
+
+(g) we can write 1 to appropriate bits in GPIOA_BSRR 
+(set and reset) whenever we want to change the output state.
+
+The only missing piece of information is the location of each register and 
+from sections about memory mapping and the GPIO register map we know that:
+
+(h) RCC_AHB1ENR is located at 0x40023814,
+(i) GPIOA_MODER is located at 0x40020000,
+(j) GPIOA_BSRR  is located at 0x40020018.
+
+===========================================================
+DOING IT IN ADA
+===========================================================
+We will use a third approach, which allows separation of concerns: the source 
+code will be responsible for business logic and the linker script will take 
+responsibility for memory layout and detailed object placement. 
+
+The advantage of this approach is that handling of addresses and memory 
+locations is kept in a single place and the program source code is not 
+polluted with hardware details.
+
+That third approach will rely on the linker to manage addresses, so we need 
+to extend the linker script with some new elements. This of course will be 
+different for each of our boards.
+
+===========================================================
+For Arduino Due the linker script (flash.ld) will look like this:
+===========================================================
+
+OUTPUT_FORMAT("elf32-littlearm")
+OUTPUT_ARCH(arm)
+SECTIONS
+{
+	PIOD_PER  = 0x400E1400;
+	PIOD_OER  = 0x400E1410;
+	PIOD_SODR = 0x400E1430;
+	PIOD_CODR = 0x400E1434;
+	
+	.vectors 0x00080000 :
+	{
+		LONG(0x20088000)
+		LONG(run + 1)
+		FILL(0)
+	}
+	.text 0x00080100 :
+	{
+		*(.text)
+	}
+}
+
+===========================================================
+For Nucleo-144 the linker script (flash.ld) will look like this:
+===========================================================
+
+OUTPUT_FORMAT("elf32-littlearm")
+OUTPUT_ARCH(arm)
+SECTIONS
+{
+	RCC_AHB1ENR = 0x40023830;
+	GPIOA_MODER = 0x40020000;
+	GPIOA_BSRR  = 0x40020018;
+	
+	.vectors 0x08000000 :
+	{
+		LONG(0x20010000)
+		LONG(run + 1)
+		FILL(0)
+	}
+	
+	.text 0x08000200 :
+	{
+		*(.text)
+	}
+}
+
+===========================================================
+For Arduino Due the program.adb will look like this:
+===========================================================
+
+package body Program is
+
+	type Word is mod 2**32;
+	
+	PIOD_PER : Word;
+	pragma Volatile (PIOD_PER);
+	pragma Import (C, PIOD_PER, "PIOD_PER");
+	
+	PIOD_OER : Word;
+	pragma Volatile (PIOD_OER);
+	pragma Import (C, PIOD_OER, "PIOD_OER");
+
+	PIOD_SODR : Word;
+	pragma Volatile (PIOD_SODR);
+	pragma Import (C, PIOD_SODR, "PIOD_SODR");
+
+	PIOD_CODR : Word;
+	pragma Volatile (PIOD_CODR);
+	pragma Import (C, PIOD_CODR, "PIOD_CODR");
+
+	procedure Run is
+	begin
+		-- configure and set high state for PD7 (for pin 11):
+		PIOD_PER  := 2#1000_0000#;
+		PIOD_OER  := 2#1000_0000#;
+		PIOD_CODR := 2#1000_0000#;
+		
+		-- configure and set low state for PD8 (for pin 12):
+		PIOD_PER  := 2#1_0000_0000#;
+		PIOD_OER  := 2#1_0000_0000#;
+		PIOD_CODR := 2#1_0000_0000#;
+
+		loop
+			null;
+		end loop;
+	end Run;
+	
+end Program;
+
+
+===========================================================
+For Nucleo-144 the program.adb will look like this:
+===========================================================
+
+package body Program is
+
+	type Word is mod 2**32;
+	
+	RCC_AHB1ENR : Word;
+	pragma Volatile (RCC_AHB1ENR);
+	pragma Import (C, RCC_AHB1ENR, "RCC_AHB1ENR");
+	
+	GPIOA_MODER : Word;
+	pragma Volatile (GPIOA_MODER);
+	pragma Import (C, GPIOA_MODER, "GPIOA_MODER");
+	
+	GPIOA_BSRR : Word;
+	pragma Volatile (GPIOA_BSRR);
+	pragma Import (C, GPIOA_BSRR, "GPIOA_BSRR");
+
+	procedure Run is
+	
+	begin
+	
+		-- configure clock for I/O port A:
+		RCC_AHB1ENR := RCC_AHB1ENR or 2#1#;
+		
+		-- configure and set high state for PA7 (for pin 11):
+		GPIOA_MODER := (GPIOA_MODER
+		and 2#1111_1111_1111_1111_0011_1111_1111_1111#)
+		or  2#0000_0000_0000_0000_0100_0000_0000_0000#;
+		
+		GPIOA_BSRR := 2#1000_0000#;
+		
+		-- configure and set low state for PA6 (for pin 12):
+		GPIOA_MODER := (GPIOB_MODER
+		and 2#1111_1111_1111_1111_1100_1111_1111_1111#)
+		or  2#0000_0000_0000_0000_0001_0000_0000_0000#;
+		
+		GPIOA_BSRR := 2#100_0000_0000_0000_0000_0000#;
+	
+		loop
+			null;
+		end loop;
+	end Run;
+
+end Program;	
+
+===========================================================
+INTERPRETATION
+===========================================================	
+The programs above, together with the program.ads specification file that we
+have written previously, is complete and does what it was supposed to do: it 
+configures pin 11 and 12 for output and sets high and low states on them.
+
+There are several new Ada elements here that should be explained:
+
+(1) variables representing registers and their type were defined at the 
+package scope, outside of the procedure Run, which can access them
+
+(2) the lines beginning with " -- " are comments,
+
+(3) " 2#1000_0000# " is a binary literal corresponding to decimal value 128 
+(bit 7 is set), whereas " 2#1_0000_0000# " is a binary literal corresponding 
+to decimal value 256 (bit 8 is set), underscores are optional and are used 
+only for readability.	
+	
+This program is complete and since it uses the same number of files as before 
+( program.ads , program.adb and flash.ld ), you can try to compile, link and 
+upload it using the same steps as were already described. We should, however, 
+take the opportunity to refactor this code in anticipation of further growth 
+and in order to abstract a bit the hardware differences between our boards - 
+after all, it is useful to think about pin 11 on the Arduino connector as 
+pin 11, without needing to work at the very detailed level of microcontroller 
+registers, which, as you can see, are different and have different usage 
+patterns on each microcontroller.
+
+FROM CHAPTER 3 - SUMMARY
+===========================================================
+GCC EQUIVALENTS FOR GNAT-ARM-ELF
+===========================================================
+gcc     ==> arm-linux-gnueabi-gnatgcc
+nm      ==> arm-linux-gnueabi-nm
+ld      ==> arm-linux-gnueabi-ld
+objcopy ==> arm-linux-gnueabi-objcopy
+
+===========================================================
+COMPILATION
+$ arm-linux-gnueabi-gnatgcc -c -gnatp -mcpu=cortex-m3 -mthumb pins.adb
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb utils.adb
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb program.adb
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb wr_unwind.c
+
+LINKING
+$ arm-linux-gnueabi-ld -T flash.ld -o program.elf pins.o utils.o wr_unwind.o program.o 
+$ arm-linux-gnueabi-nm program.elf
+
+CREATING BINARIES
+$ arm-linux-gnueabi-objcopy -O binary program.elf program.bin
+$ arm-linux-gnueabi-objcopy -O ihex   program.elf program.hex
+
+===========================================================
+:~$ cd github/ada-common/
+:~/github/ada-common$ ls -al
+total 20
+drwxrwxr-x  5 wruslan wruslan 4096 Jan 12 11:23 .
+drwxrwxr-x 14 wruslan wruslan 4096 Jan 12 10:17 ..
+drwxrwxr-x  2 wruslan wruslan 4096 Jan 12 11:22 arduino-due
+drwxrwxr-x  2 wruslan wruslan 4096 Jan 12 11:22 common
+drwxrwxr-x  2 wruslan wruslan 4096 Jan 12 11:22 nucleo-144
+:~/github/ada-common$ tree ./
+./
+├── arduino-due
+│   ├── flash.ld           <== SPECIFIC FOR arduino-due
+│   ├── pins.adb           <== SPECIFIC FOR arduino-due
+│   ├── pins.ads
+│   ├── program.adb
+|   ├── program.ads
+│   ├── registers.ads      <== SPECIFIC FOR arduino-due
+│   ├── utils.adb
+│   ├── utils.ads
+│   ├── wr_unwind.c
+│   └── wr_unwind.h
+├── common
+│   ├── pins.ads
+│   ├── program.adb
+|   ├── program.ads
+│   ├── utils.adb
+│   ├── utils.ads
+│   ├── wr_unwind.c
+│   └── wr_unwind.h
+└── nucleo-144
+    ├── flash.ld           <== SPECIFIC FOR nucleo-144
+    ├── pins.adb           <== SPECIFIC FOR nucleo-144
+    ├── pins.ads
+    ├── program.adb
+    ├── program.ads
+    ├── registers.ads      <== SPECIFIC FOR nucleo-144
+    ├── utils.adb
+    ├── utils.ads
+    ├── wr_unwind.c
+    └── wr_unwind.h
+
+3 directories, 24 files
+:~/github/ada-common$ 
+
+===========================================================
+COMPILATION
+===========================================================
+$ arm-linux-gnueabi-gnatgcc -c -gnatp -mcpu=cortex-m3 -mthumb pins.adb
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb utils.adb
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb program.adb
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb wr_unwind.c
+
+:~/github/ada-common$ cd arduino-due/
+:~/github/ada-common/arduino-due$ ls -al
+total 44
+drwxrwxr-x 2 wruslan wruslan 4096 Jan 12 11:22 .
+drwxrwxr-x 5 wruslan wruslan 4096 Jan 12 11:23 ..
+-rw-rw-r-- 1 wruslan wruslan  392 Jan 12 11:05 flash.ld
+-rw-rw-r-- 1 wruslan wruslan  841 Jan 12 10:53 pins.adb
+-rw-rw-r-- 1 wruslan wruslan  283 Jan 12 10:34 pins.ads
+-rw-rw-r-- 1 wruslan wruslan  362 Jan 12 11:00 program.adb
+-rw-r--r-- 1 wruslan wruslan   86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan  619 Jan 12 10:27 registers.ads
+-rw-rw-r-- 1 wruslan wruslan  221 Jan 12 10:20 utils.adb
+-rw-rw-r-- 1 wruslan wruslan  154 Jan 12 10:21 utils.ads
+-rw-rw-r-- 1 wruslan wruslan   40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan   36 Jan  7 10:03 wr_unwind.h
+
+$ arm-linux-gnueabi-gnatgcc -c -gnatp -mcpu=cortex-m3 -mthumb pins.adb
+:~/github/ada-common/arduino-due$ ls -al
+total 52
+drwxrwxr-x 2 wruslan wruslan 4096 Jan 12 11:33 .
+drwxrwxr-x 5 wruslan wruslan 4096 Jan 12 11:23 ..
+-rw-rw-r-- 1 wruslan wruslan  392 Jan 12 11:05 flash.ld
+-rw-rw-r-- 1 wruslan wruslan  841 Jan 12 10:53 pins.adb
+-rw-rw-r-- 1 wruslan wruslan  283 Jan 12 10:34 pins.ads
+-rw-rw-r-- 1 wruslan wruslan 1022 Jan 12 11:33 pins.ali
+-rw-rw-r-- 1 wruslan wruslan 1656 Jan 12 11:33 pins.o        <== THIS ONE
+-rw-rw-r-- 1 wruslan wruslan  362 Jan 12 11:00 program.adb
+-rw-r--r-- 1 wruslan wruslan   86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan  619 Jan 12 10:27 registers.ads
+-rw-rw-r-- 1 wruslan wruslan  221 Jan 12 10:20 utils.adb
+-rw-rw-r-- 1 wruslan wruslan  154 Jan 12 10:21 utils.ads
+-rw-rw-r-- 1 wruslan wruslan   40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan   36 Jan  7 10:03 wr_unwind.h
+
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb utils.adb
+:~/github/ada-common/arduino-due$ ls -al
+total 60
+drwxrwxr-x 2 wruslan wruslan 4096 Jan 12 11:34 .
+drwxrwxr-x 5 wruslan wruslan 4096 Jan 12 11:23 ..
+-rw-rw-r-- 1 wruslan wruslan  392 Jan 12 11:05 flash.ld
+-rw-rw-r-- 1 wruslan wruslan  841 Jan 12 10:53 pins.adb
+-rw-rw-r-- 1 wruslan wruslan  283 Jan 12 10:34 pins.ads
+-rw-rw-r-- 1 wruslan wruslan 1022 Jan 12 11:33 pins.ali
+-rw-rw-r-- 1 wruslan wruslan 1656 Jan 12 11:33 pins.o
+-rw-rw-r-- 1 wruslan wruslan  362 Jan 12 11:00 program.adb
+-rw-r--r-- 1 wruslan wruslan   86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan  619 Jan 12 10:27 registers.ads
+-rw-rw-r-- 1 wruslan wruslan  221 Jan 12 10:20 utils.adb
+-rw-rw-r-- 1 wruslan wruslan  154 Jan 12 10:21 utils.ads
+-rw-rw-r-- 1 wruslan wruslan  432 Jan 12 11:34 utils.ali
+-rw-rw-r-- 1 wruslan wruslan 1140 Jan 12 11:34 utils.o        <== THIS ONE
+-rw-rw-r-- 1 wruslan wruslan   40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan   36 Jan  7 10:03 wr_unwind.h
+
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb program.adb
+:~/github/ada-common/arduino-due$ ls -al
+total 72
+drwxrwxr-x 2 wruslan wruslan 4096 Jan 12 11:35 .
+drwxrwxr-x 5 wruslan wruslan 4096 Jan 12 11:23 ..
+-rw-rw-r-- 1 wruslan wruslan  392 Jan 12 11:05 flash.ld
+-rw-rw-r-- 1 wruslan wruslan  841 Jan 12 10:53 pins.adb
+-rw-rw-r-- 1 wruslan wruslan  283 Jan 12 10:34 pins.ads
+-rw-rw-r-- 1 wruslan wruslan 1022 Jan 12 11:33 pins.ali
+-rw-rw-r-- 1 wruslan wruslan 1656 Jan 12 11:33 pins.o
+-rw-rw-r-- 1 wruslan wruslan  362 Jan 12 11:00 program.adb
+-rw-r--r-- 1 wruslan wruslan   86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan  874 Jan 12 11:35 program.ali
+-rw-rw-r-- 1 wruslan wruslan 1344 Jan 12 11:35 program.o     <== THIS ONE
+-rw-rw-r-- 1 wruslan wruslan  619 Jan 12 10:27 registers.ads
+-rw-rw-r-- 1 wruslan wruslan  221 Jan 12 10:20 utils.adb
+-rw-rw-r-- 1 wruslan wruslan  154 Jan 12 10:21 utils.ads
+-rw-rw-r-- 1 wruslan wruslan  432 Jan 12 11:34 utils.ali
+-rw-rw-r-- 1 wruslan wruslan 1140 Jan 12 11:34 utils.o
+-rw-rw-r-- 1 wruslan wruslan   40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan   36 Jan  7 10:03 wr_unwind.h
+
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m3 -mthumb wr_unwind.c
+:~/github/ada-common/arduino-due$ ls -al
+total 76
+drwxrwxr-x 2 wruslan wruslan 4096 Jan 12 11:36 .
+drwxrwxr-x 5 wruslan wruslan 4096 Jan 12 11:23 ..
+-rw-rw-r-- 1 wruslan wruslan  392 Jan 12 11:05 flash.ld
+-rw-rw-r-- 1 wruslan wruslan  841 Jan 12 10:53 pins.adb
+-rw-rw-r-- 1 wruslan wruslan  283 Jan 12 10:34 pins.ads
+-rw-rw-r-- 1 wruslan wruslan 1022 Jan 12 11:33 pins.ali
+-rw-rw-r-- 1 wruslan wruslan 1656 Jan 12 11:33 pins.o
+-rw-rw-r-- 1 wruslan wruslan  362 Jan 12 11:00 program.adb
+-rw-r--r-- 1 wruslan wruslan   86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan  874 Jan 12 11:35 program.ali
+-rw-rw-r-- 1 wruslan wruslan 1344 Jan 12 11:35 program.o
+-rw-rw-r-- 1 wruslan wruslan  619 Jan 12 10:27 registers.ads
+-rw-rw-r-- 1 wruslan wruslan  221 Jan 12 10:20 utils.adb
+-rw-rw-r-- 1 wruslan wruslan  154 Jan 12 10:21 utils.ads
+-rw-rw-r-- 1 wruslan wruslan  432 Jan 12 11:34 utils.ali
+-rw-rw-r-- 1 wruslan wruslan 1140 Jan 12 11:34 utils.o
+-rw-rw-r-- 1 wruslan wruslan   40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan   36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r-- 1 wruslan wruslan  836 Jan 12 11:36 wr_unwind.o    <== THIS ONE
+:~/github/ada-common/arduino-due$ 
+
+===========================================================
+LINKING
+===========================================================
+$ arm-linux-gnueabi-ld -T flash.ld -o program.elf pins.o utils.o wr_unwind.o program.o 
+
+$ arm-linux-gnueabi-ld -T flash.ld -o program.elf pins.o utils.o wr_unwind.o program.o 
+:~/github/ada-common/arduino-due$ ls -al
+total 84
+drwxrwxr-x 2 wruslan wruslan  4096 Jan 12 11:42 .
+drwxrwxr-x 5 wruslan wruslan  4096 Jan 12 11:23 ..
+-rw-rw-r-- 1 wruslan wruslan   277 Jan 12 11:42 flash.ld
+-rw-rw-r-- 1 wruslan wruslan   841 Jan 12 10:53 pins.adb
+-rw-rw-r-- 1 wruslan wruslan   283 Jan 12 10:34 pins.ads
+-rw-rw-r-- 1 wruslan wruslan  1022 Jan 12 11:33 pins.ali
+-rw-rw-r-- 1 wruslan wruslan  1656 Jan 12 11:33 pins.o
+-rw-rw-r-- 1 wruslan wruslan   362 Jan 12 11:00 program.adb
+-rw-r--r-- 1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan   874 Jan 12 11:35 program.ali
+-rwxrwxr-x 1 wruslan wruslan 67556 Jan 12 11:42 program.elf   <== THIS ONE
+-rw-rw-r-- 1 wruslan wruslan  1344 Jan 12 11:35 program.o
+-rw-rw-r-- 1 wruslan wruslan   619 Jan 12 10:27 registers.ads
+-rw-rw-r-- 1 wruslan wruslan   221 Jan 12 10:20 utils.adb
+-rw-rw-r-- 1 wruslan wruslan   154 Jan 12 10:21 utils.ads
+-rw-rw-r-- 1 wruslan wruslan   432 Jan 12 11:34 utils.ali
+-rw-rw-r-- 1 wruslan wruslan  1140 Jan 12 11:34 utils.o
+-rw-rw-r-- 1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r-- 1 wruslan wruslan   836 Jan 12 11:36 wr_unwind.o
+:~/github/ada-common/arduino-due$ 
+
+===========================================================
+INSPECT SYMBOLS
+===========================================================
+$ arm-linux-gnueabi-nm program.elf
+
+:~/github/ada-common/arduino-due$ arm-linux-gnueabi-nm program.elf
+000801a0 T __aeabi_unwind_cpp_pr0
+0008020c D pins_E
+00080100 T pins__enable_output
+00080208 R pins__pin_idN
+000801fc R pins__pin_idS
+00080140 T pins__write
+400e1434 A PIOD_CODR
+400e1410 A PIOD_OER
+400e1400 A PIOD_PER
+400e1430 A PIOD_SODR
+00080210 D program_E
+000801ac T run
+0008020e D utils_E
+00080198 T utils__spin_indefinitely
+:~/github/ada-common/arduino-due$ 
+
+===========================================================
+CREATE BINARIES
+===========================================================
+$ arm-linux-gnueabi-objcopy -O binary program.elf program.bin
+$ arm-linux-gnueabi-objcopy -O ihex   program.elf program.hex
+
+$ arm-linux-gnueabi-objcopy -O binary program.elf program.bin
+$ arm-linux-gnueabi-objcopy -O ihex   program.elf program.hex
+:~/github/ada-common/arduino-due$ ls -al
+total 92
+drwxrwxr-x 2 wruslan wruslan  4096 Jan 12 11:49 .
+drwxrwxr-x 5 wruslan wruslan  4096 Jan 12 11:23 ..
+-rw-rw-r-- 1 wruslan wruslan   277 Jan 12 11:42 flash.ld
+-rw-rw-r-- 1 wruslan wruslan   841 Jan 12 10:53 pins.adb
+-rw-rw-r-- 1 wruslan wruslan   283 Jan 12 10:34 pins.ads
+-rw-rw-r-- 1 wruslan wruslan  1022 Jan 12 11:33 pins.ali
+-rw-rw-r-- 1 wruslan wruslan  1656 Jan 12 11:33 pins.o
+-rw-rw-r-- 1 wruslan wruslan   362 Jan 12 11:00 program.adb
+-rw-r--r-- 1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan   874 Jan 12 11:35 program.ali
+-rwxrwxr-x 1 wruslan wruslan   530 Jan 12 11:49 program.bin  <== THIS ONE
+-rwxrwxr-x 1 wruslan wruslan 67556 Jan 12 11:42 program.elf
+-rw-rw-r-- 1 wruslan wruslan   875 Jan 12 11:49 program.hex  <== THIS ONE
+-rw-rw-r-- 1 wruslan wruslan  1344 Jan 12 11:35 program.o
+-rw-rw-r-- 1 wruslan wruslan   619 Jan 12 10:27 registers.ads
+-rw-rw-r-- 1 wruslan wruslan   221 Jan 12 10:20 utils.adb
+-rw-rw-r-- 1 wruslan wruslan   154 Jan 12 10:21 utils.ads
+-rw-rw-r-- 1 wruslan wruslan   432 Jan 12 11:34 utils.ali
+-rw-rw-r-- 1 wruslan wruslan  1140 Jan 12 11:34 utils.o
+-rw-rw-r-- 1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r-- 1 wruslan wruslan   836 Jan 12 11:36 wr_unwind.o
+:~/github/ada-common/arduino-due$ 
+
+
+===========================================================
+UPLOADING program.bin FOR ARDUINO DUE (USE bossac)
+===========================================================
+CONNECT USING THE USB PROGRAMMING PORT OF ARDUINO DUE
+CONNECT ARDUINO DUE TO COMPUTER
+
+$ bossac --help
+$ sudo stty --file=/dev/ttyACM0 1200
+$ sudo bossac -e -w -v -b program.bin
+
+:~/github/ada-common/arduino-due$ sudo stty --file=/dev/ttyACM0 1200
+[sudo] password for wruslan: 
+:~/github/ada-common/arduino-due$ sudo bossac -e -w -v -b program.bin
+Erase flash
+
+Done in 0.053 seconds
+Write 530 bytes to flash (3 pages)
+[==============================] 100% (3/3 pages)
+Done in 0.131 seconds
+Verify 530 bytes of flash
+[==============================] 100% (3/3 pages)
+Verify successful
+Done in 0.139 seconds
+Set boot flash true
+:~/github/ada-common/arduino-due$ 
+
+===========================================================
+SAME PROCEDURE FOR NUCLEO-144
+===========================================================
+:~/github/ada-common/nucleo-144$ ls -al
+total 48
+drwxrwxr-x 2 wruslan wruslan 4096 Jan 12 12:04 .
+drwxrwxr-x 5 wruslan wruslan 4096 Jan 12 11:23 ..
+-rw-rw-r-- 1 wruslan wruslan  260 Jan 12 11:53 flash.ld      <== SPECIFIC
+-rw-rw-r-- 1 wruslan wruslan 1116 Jan 12 10:47 pins.adb      <== SPECIFIC
+-rw-rw-r-- 1 wruslan wruslan  258 Jan 12 10:31 pins.ads
+-rw-rw-r-- 1 wruslan wruslan  362 Jan 12 11:00 program.adb
+-rw-r--r-- 1 wruslan wruslan   86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan  549 Jan 12 10:32 registers.ads <== SPECIFIC
+-rw-rw-r-- 1 wruslan wruslan  221 Jan 12 10:20 utils.adb
+-rw-rw-r-- 1 wruslan wruslan  154 Jan 12 10:21 utils.ads
+-rw-rw-r-- 1 wruslan wruslan   40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan   36 Jan  7 10:03 wr_unwind.h
+:~/github/ada-common/nucleo-144$ 
+
+COMPILATION
+===========================================================
+$ arm-linux-gnueabi-gnatgcc -c -gnatp -mcpu=cortex-m7 -mthumb pins.adb
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m7 -mthumb utils.adb
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m7 -mthumb program.adb
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m7 -mthumb wr_unwind.c
+
+:~/github/ada-common/nucleo-144$ arm-linux-gnueabi-gnatgcc -c -gnatp -mcpu=cortex-m7 -mthumb pins.adb
+:~/github/ada-common/nucleo-144$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m7 -mthumb utils.adb
+:~/github/ada-common/nucleo-144$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m7 -mthumb program.adb
+:~/github/ada-common/nucleo-144$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m7 -mthumb wr_unwind.c
+:~/github/ada-common/nucleo-144$ ls -l
+total 68
+-rw-rw-r-- 1 wruslan wruslan  260 Jan 12 11:53 flash.ld
+-rw-rw-r-- 1 wruslan wruslan 1116 Jan 12 10:47 pins.adb
+-rw-rw-r-- 1 wruslan wruslan  258 Jan 12 10:31 pins.ads
+-rw-rw-r-- 1 wruslan wruslan 1039 Jan 12 12:08 pins.ali
+-rw-rw-r-- 1 wruslan wruslan 1640 Jan 12 12:08 pins.o
+-rw-rw-r-- 1 wruslan wruslan  362 Jan 12 11:00 program.adb
+-rw-r--r-- 1 wruslan wruslan   86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan  873 Jan 12 12:09 program.ali
+-rw-rw-r-- 1 wruslan wruslan 1344 Jan 12 12:09 program.o
+-rw-rw-r-- 1 wruslan wruslan  549 Jan 12 10:32 registers.ads
+-rw-rw-r-- 1 wruslan wruslan  221 Jan 12 10:20 utils.adb
+-rw-rw-r-- 1 wruslan wruslan  154 Jan 12 10:21 utils.ads
+-rw-rw-r-- 1 wruslan wruslan  433 Jan 12 12:09 utils.ali
+-rw-rw-r-- 1 wruslan wruslan 1140 Jan 12 12:09 utils.o
+-rw-rw-r-- 1 wruslan wruslan   40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan   36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r-- 1 wruslan wruslan  840 Jan 12 12:09 wr_unwind.o
+:~/github/ada-common/nucleo-144$ 
+
+===========================================================
+:~/github/ada-common/nucleo-144$ arm-linux-gnueabi-ld -T flash.ld -o program.elf pins.o utils.o wr_unwind.o program.o 
+:~/github/ada-common/nucleo-144$ ls -l
+total 76
+-rw-rw-r-- 1 wruslan wruslan   260 Jan 12 11:53 flash.ld
+-rw-rw-r-- 1 wruslan wruslan  1116 Jan 12 10:47 pins.adb
+-rw-rw-r-- 1 wruslan wruslan   258 Jan 12 10:31 pins.ads
+-rw-rw-r-- 1 wruslan wruslan  1039 Jan 12 12:08 pins.ali
+-rw-rw-r-- 1 wruslan wruslan  1640 Jan 12 12:08 pins.o
+-rw-rw-r-- 1 wruslan wruslan   362 Jan 12 11:00 program.adb
+-rw-r--r-- 1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan   873 Jan 12 12:09 program.ali
+-rwxrwxr-x 1 wruslan wruslan 67804 Jan 12 12:11 program.elf
+-rw-rw-r-- 1 wruslan wruslan  1344 Jan 12 12:09 program.o
+-rw-rw-r-- 1 wruslan wruslan   549 Jan 12 10:32 registers.ads
+-rw-rw-r-- 1 wruslan wruslan   221 Jan 12 10:20 utils.adb
+-rw-rw-r-- 1 wruslan wruslan   154 Jan 12 10:21 utils.ads
+-rw-rw-r-- 1 wruslan wruslan   433 Jan 12 12:09 utils.ali
+-rw-rw-r-- 1 wruslan wruslan  1140 Jan 12 12:09 utils.o
+-rw-rw-r-- 1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r-- 1 wruslan wruslan   840 Jan 12 12:09 wr_unwind.o
+:~/github/ada-common/nucleo-144$ 
+
+===========================================================
+:~/github/ada-common/nucleo-144$ arm-linux-gnueabi-nm program.elf
+080002ac T __aeabi_unwind_cpp_pr0
+40020018 A GPIOA_BSRR
+40020000 A GPIOA_MODER
+08000318 D pins_E
+08000200 T pins__enable_output
+08000314 R pins__pin_idN
+08000308 R pins__pin_idS
+08000250 T pins__write
+0800031c D program_E
+40023830 A RCC_AHB1ENR
+080002b8 T run
+0800031a D utils_E
+080002a4 T utils__spin_indefinitely
+:~/github/ada-common/nucleo-144$ 
+
+===========================================================
+CREATE BINARIES
+===========================================================
+$ arm-linux-gnueabi-objcopy -O binary program.elf program.bin
+$ arm-linux-gnueabi-objcopy -O ihex   program.elf program.hex
+:~/github/ada-common/nucleo-144$ arm-linux-gnueabi-objcopy -O binary program.elf program.bin
+:~/github/ada-common/nucleo-144$ arm-linux-gnueabi-objcopy -O ihex   program.elf program.hex
+:~/github/ada-common/nucleo-144$ ls -al
+total 92
+drwxrwxr-x 2 wruslan wruslan  4096 Jan 12 12:16 .
+drwxrwxr-x 5 wruslan wruslan  4096 Jan 12 11:23 ..
+-rw-rw-r-- 1 wruslan wruslan   260 Jan 12 11:53 flash.ld
+-rw-rw-r-- 1 wruslan wruslan  1116 Jan 12 10:47 pins.adb
+-rw-rw-r-- 1 wruslan wruslan   258 Jan 12 10:31 pins.ads
+-rw-rw-r-- 1 wruslan wruslan  1039 Jan 12 12:08 pins.ali
+-rw-rw-r-- 1 wruslan wruslan  1640 Jan 12 12:08 pins.o
+-rw-rw-r-- 1 wruslan wruslan   362 Jan 12 11:00 program.adb
+-rw-r--r-- 1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan   873 Jan 12 12:09 program.ali
+-rwxrwxr-x 1 wruslan wruslan   798 Jan 12 12:16 program.bin
+-rwxrwxr-x 1 wruslan wruslan 67804 Jan 12 12:11 program.elf
+-rw-rw-r-- 1 wruslan wruslan   899 Jan 12 12:16 program.hex
+-rw-rw-r-- 1 wruslan wruslan  1344 Jan 12 12:09 program.o
+-rw-rw-r-- 1 wruslan wruslan   549 Jan 12 10:32 registers.ads
+-rw-rw-r-- 1 wruslan wruslan   221 Jan 12 10:20 utils.adb
+-rw-rw-r-- 1 wruslan wruslan   154 Jan 12 10:21 utils.ads
+-rw-rw-r-- 1 wruslan wruslan   433 Jan 12 12:09 utils.ali
+-rw-rw-r-- 1 wruslan wruslan  1140 Jan 12 12:09 utils.o
+-rw-rw-r-- 1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r-- 1 wruslan wruslan   840 Jan 12 12:09 wr_unwind.o
+:~/github/ada-common/nucleo-144$ 
+
+===========================================================
+UPLOADING program.bin FOR STM32 NUCLEO-144 (USE openocd)
+===========================================================
+$ openocd --help
+$ sudo cp /usr/share/openocd/scripts/board/st_nucleo_f4.cfg /usr/share/openocd/scripts/board/st_nucleo_f7.cfg
+
+source [find interface/stlink-v2-1.cfg]
+transport select hla_swd
+source [find target/stm32f7x.cfg]         <=== THIS ONE REPLACED f4x WITH f7x
+reset_config srst_only
+
+$ openocd -s scripts/ -f board/st_nucleo_f7.cfg -c 'program program.bin reset exit 0x08000000'
+
+:~/github/ada-common/nucleo-144$ openocd -s scripts/ -f board/st_nucleo_f7.cfg -c 'program program.bin reset exit 0x08000000'
+Open On-Chip Debugger 0.10.0
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+Info : The selected transport took over low-level target control. The results might differ compared to plain JTAG/SWD
+adapter speed: 2000 kHz
+adapter_nsrst_delay: 100
+srst_only separate srst_nogate srst_open_drain connect_deassert_srst
+srst_only separate srst_nogate srst_open_drain connect_deassert_srst
+Info : Unable to match requested speed 2000 kHz, using 1800 kHz
+Info : Unable to match requested speed 2000 kHz, using 1800 kHz
+Info : clock speed 1800 kHz
+Info : STLINK v2 JTAG v29 API v2 SWIM v18 VID 0x0483 PID 0x374B
+Info : using stlink api v2
+Info : Target voltage: 3.251154
+Info : stm32f7x.cpu: hardware has 8 breakpoints, 4 watchpoints
+target halted due to debug-request, current mode: Thread 
+xPSR: 0x01000000 pc: 0x08000200 msp: 0x20010000
+** Programming Started **
+auto erase enabled
+Info : device id = 0x10016451
+Info : flash size = 2048kbytes
+Info : Single Bank 2048 kiB STM32F76x/77x found
+target halted due to breakpoint, current mode: Thread 
+xPSR: 0x61000000 pc: 0x20000046 msp: 0x20010000
+wrote 32768 bytes from file program.bin in 0.753987s (42.441 KiB/s)
+** Programming Finished **
+** Resetting Target **
+shutdown command invoked
+:~/github/ada-common/nucleo-144$ 
+
+===========================================================
+ALHAMDULILLAH 3 TIMES WRY.
+===========================================================
+

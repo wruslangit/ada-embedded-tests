@@ -2,13 +2,13 @@ OUTPUT_FORMAT("elf32-littlearm")
 OUTPUT_ARCH(arm)
 SECTIONS
 {
-	.vectors 0x00004000 :
+	.vectors 0x08000000 :
 	{
-		LONG(0x20008000)
+		LONG(0x20001000)
 		LONG(run + 1)
 		FILL(0)
 	}
-	.text 0x00004100 :
+	.text 0x08000100 :
 	{
 		*(.text)
 	}

@@ -1,0 +1,21 @@
+V "GNAT Lib v9"
+A -mcpu=cortex-m3
+A -mthumb
+A -mfloat-abi=soft
+A -mtls-dialect=gnu
+A -march=armv7-m
+P ZX
+
+RN
+
+U utils%b		utils.adb		363b3580 NE OO PK IL
+
+U utils%s		utils.ads		96efa6b3 EE NE OO PK IL
+
+D system.ads		20200312110721 77e65b42 system%s
+D utils.ads		20210112022120 96efa6b3 utils%s
+D utils.adb		20210112022054 a0d49333 utils%b
+X 2 utils.ads
+5K9*utils 7l5 7e10 3|5b14 12l5 12t10
+6U19*spin_indefinitely 3|6b19 11l13 11t30
+

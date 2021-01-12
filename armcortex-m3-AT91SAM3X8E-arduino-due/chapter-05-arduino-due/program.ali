@@ -1,0 +1,34 @@
+V "GNAT Lib v9"
+A -mcpu=cortex-m3
+A -mthumb
+A -mfloat-abi=soft
+A -mtls-dialect=gnu
+A -march=armv7-m
+P ZX
+
+RN
+
+U program%b		program.adb		2fdfe0ea NE OO PK IL
+W pins%s		pins.adb		pins.ali
+W utils%s		utils.adb		utils.ali
+
+U program%s		program.ads		aea7b72e EE NE OO PK
+
+D pins.ads		20210112023453 fb9ce34b pins%s
+D program.ads		20160303161100 aea7b72e program%s
+D program.adb		20210112030048 ec0b123c program%b
+D system.ads		20200312110721 77e65b42 system%s
+D utils.ads		20210112022120 96efa6b3 utils%s
+X 1 pins.ads
+7K9*pins 11e9 3|5w6 11r17 11r37 12r17 12r37 14r17 14r29 15r17 15r29
+8n26*Pin_11{8E14} 3|11r42 14r34
+8n34*Pin_12{8E14} 3|12r42 15r34
+9U19*Enable_Output 3|11s22 12s22
+10U19*Write 3|14s22 15s22
+X 2 program.ads
+1K9*Program 6l5 6e12 3|8b14 19l5 19t12
+3U14*Run 4i<c,run>22 3|9b19 18l13 18t16
+X 5 utils.ads
+5K9*utils 3|6w6 17r17 5|7e10
+6U19*spin_indefinitely 3|17s23
+

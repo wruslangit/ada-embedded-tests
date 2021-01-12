@@ -394,7 +394,7 @@ drwxrwxr-x 10 wruslan wruslan  4096 Jan  6 22:45 ..
 Ub2004-rt38:~/github/embedded-ada-tests/test-m7-codes$ 
 
 ===========================================================
-Note: It is the HEX file that is downloaded to the ARM-Cortex-M7 embedded board (STM32-F767ZI Nucleo-144)
+Note: It is the BIN file that is downloaded to the ARM-Cortex-M7 embedded board (STM32-F767ZI Nucleo-144)
 
 [1]+  Stopped                 hexedit wr_unwind.o
 Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ hexedit program.o

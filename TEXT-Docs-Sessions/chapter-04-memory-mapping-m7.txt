@@ -1,0 +1,684 @@
+File: chapter-04-memory-mapping-m7.txt
+Date: Sun 10 Jan 2021 09:14:00 AM +08
+Author: WRY wruslandr@gmail.com
+
+FROM CHAPTER 3 - SUMMARY
+===========================================================
+GCC EQUIVALENTS FOR GNAT-ARM-ELF
+===========================================================
+gcc     ==> arm-linux-gnueabi-gnatgcc
+nm      ==> arm-linux-gnueabi-nm
+ld      ==> arm-linux-gnueabi-ld
+objcopy ==> arm-linux-gnueabi-objcopy
+
+===========================================================
+GENERATE program.bin
+===========================================================
+$ cat flash.ld 
+$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m7 -mthumb program.adb
+$ arm-linux-gnueabi-gnatgcc -S -mcpu=cortex-m7 -mthumb wr_unwind.c
+$ cat program.s
+$ cat wr_unwind.c
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m7 -mthumb program.adb
+$ arm-linux-gnueabi-gnatgcc -c -mcpu=cortex-m7 -mthumb wr_unwind.c
+$ arm-linux-gnueabi-nm program.o
+$ arm-linux-gnueabi-nm wr_unwind.o
+$ arm-linux-gnueabi-ld -T flash.ld -o program.elf program.o wr_unwind.o
+$ arm-linux-gnueabi-nm program.elf
+$ arm-linux-gnueabi-objcopy -O binary program.elf program.bin
+$ arm-linux-gnueabi-objcopy -O ihex program.elf program.hex
+
+===========================================================
+UPLOADING program.bin FOR ARDUINO DUE (USE bossac)
+===========================================================
+$ bossac --help
+$ sudo stty --file=/dev/ttyACM0 1200
+$ sudo bossac -e -w -v -b program.bin
+....
+....
+SUCCESS UPLOAD. ALHAMDULILLAH 3 TIMES WRY.
+
+===========================================================
+UPLOADING program.bin FOR STM32 NUCLEO-144 (USE openocd)
+===========================================================
+$ openocd --help
+$ sudo cp /usr/share/openocd/scripts/board/st_nucleo_f4.cfg /usr/share/openocd/scripts/board/st_nucleo_f7.cfg
+
+source [find interface/stlink-v2-1.cfg]
+transport select hla_swd
+source [find target/stm32f7x.cfg]         <=== THIS ONE REPLACED f4x WITH f7x
+reset_config srst_only
+
+$ openocd -s scripts/ -f board/st_nucleo_f7.cfg -c 'program program.bin reset exit 0x08000000'
+....
+....
+SUCCESS UPLOAD. ALHAMDULILLAH 3 TIMES WRY.
+END OF SUMMARY
+
+===========================================================
+CHAPTER 4 - MEMORY MAPPING
+===========================================================
+(1) Flash Memory ==> program location (binary images) 
+(2) SRAM Memory  ==> run-time data location (Static Random Access Memory)
+
+Flash memory is an electronic non-volatile computer memory storage medium 
+that can be electrically erased and reprogrammed. The two main types of flash
+memory, NOR flash and NAND flash, are named after the NOR and NAND logic gates. 
+The individual flash memory cells, consisting of floating-gate MOSFETs, 
+exhibit internal characteristics similar to those of the corresponding gates. 
+
+Static random-access memory (static RAM or SRAM) is a type of random-access 
+memory (RAM) that uses latching circuitry (flip-flop) to store each bit. 
+SRAM is volatile memory; data is lost when power is removed. The term static 
+differentiates SRAM from DRAM (dynamic random-access memory) which must be 
+periodically refreshed. SRAM is faster and more expensive than DRAM; it is 
+typically used for CPU cache while DRAM is used for a computer's main memory. 
+
+===========================================================
+The Internal Flash memory is located at the beginning of the memory
+space, which is 0x00000000. The ability of the chip to protect some initial 
+area of the flash for the purpose of the bootloader. The protected area ends
+at Flash Start address.
+
+                     FLASH START  SIZE    SRAM START  SIZE   SRAM END
+                     ===========  ====    ==========  ====   ========
+(1) Arduino M0       0x00004000   256 KB  0x20000000  32 KB  0x20007FFF           
+(2) Arduino Due      0x00080000   512 KB  0x20070000  96 KB  0x20077FFF
+(3) STM32 Nucleo     0x08000000    32 KB  0x20000000   4 KB  0x20000FFF     
+(4) STM32 Nucleo-144 0x08000000  1024 KB  0x20000000  64 KB  0x2000FFFF
+
+===========================================================
+(2) ARDUINO DUE (ArmCortex-M3)
+===========================================================
+The flash memory starts at address 0x00080000 and has a span of 512 kB. 
+The starting address is importan here. Anything that we upload to the 
+flash memory will be visible at that address range, that is, the first byte
+of our binary images will be placed at address 0x00080000, the second byte
+at address 0x00080001, and so on. We do not need to prepare images that 
+have "empty space" at the beginning in order to fit that starting address.
+
+The Arduino Due board is able to boot in two modes: 
+
+(2.1) the bootloader mode that is used to upload new programs to the flash 
+memory (this mode can be entered after pressing ERASE button and the
+RESET button) 
+
+(2.2) the flash mode that is established by bootloader (to be exact, bossac 
+sends the instruction to the bootloader to do it) after new program is loaded. 
+
+This is convenient and from the microcontroller point of view differs only 
+in which address is considered the starting one. 
+
+In the bootloader mode it is the 0x0 address (and as you can see on the 
+diagram in the documentation, the boot memory is located there). 
+
+In the flash mode the beginning of the flash memory is visible there instead,
+as explained in more detail below. In other words, once the program is loaded, 
+each subsequent reboot will cause the board to effectively start from address
+0x00080000. This is where we put our binary images.
+
+Another value that is of interest to us from the Product Mapping is the 
+extent of the SRAM memory, where the program will store its run-time data. 
+The size is 96kB, visible in a continuous range from 0x20070000 to 0x20087FFF.
+
+===========================================================
+(4) STM32 Nucleo-144 (ArmCortex-M7)
+===========================================================
+Similar to Arduino Due and Nucleo-32, the Nucleo-144 board is able to 
+boot in several different modes. One of these modes ensures that the 
+flash memory range is aliased at address 0x0, where the processor expect
+to find the beginning of the vector table (see below for more details on this). 
+
+In other words, in Nucleo-144 once the program is loaded, each subsequent 
+reboot will cause the board to effectively start from address 0x08000000. 
+This is where we put our binary images.
+
+Another value that is of interest to us from the Memory Mapping is the 
+extent of the SRAM memory, where the program will store its run-time data. 
+
+The Nucleo-144 board has several regions of SRAM that together form 
+a continuous address range, but these regions are accessed on different 
+buses and have different access times. We can see that the first 64kB block of
+memory is described as intended for "critical real-time data" and for the
+sake of simplicity we can decide to use only that block, as it is definitely 
+big enough for our purposes. This memory is visible in the address range
+from 0x20000000 to 0x2000FFFF.
+
+===========================================================
+IMPORTANT MICROCONTROLLER ADDRESSES
+===========================================================
+The documentation for each microcontroller (and the ARM documentation in 
+general) describes the so-called vector table, which is an array containing 
+several important addresses. 
+
+The ones that are of interest to us at the moment are at the bottom 
+(meaning beginning) of the table:
+
+(1) top of stack space - a value one more than the address of the last 
+byte of the stack space should be put as the first word of the vector table; 
+we have already established these boundaries for each of our boards above.
+
+(2) initial value for the Program Counter (PC) register, which really means 
+the starting point for our program (this is known as the reset handler).
+As you remember from the previous chapter, we want the Run procedure 
+(visible to the linker as symbol run) to be the first that is called 
+when the program starts; this address should be put as the second word 
+of the vector table.
+
+SEE flash.ld FROM CHAPTER-03
+===========================================================
+Ub2004-rt38:~/github/embedded-ada-tests/test-m0-codes$ cat flash.ld 
+OUTPUT_FORMAT("elf32-littlearm")
+OUTPUT_ARCH(arm)
+
+SECTIONS
+{
+    .vectors 0x08000000 :
+    {
+        LONG(0x20010000)
+        LONG(run + 1)
+        FILL(0)
+    }
+
+    .text 0x08000200 :
+    {
+        *(.text)
+    }
+}
+
+===========================================================
+nm - list symbols from object files
+===========================================================
+$ arm-linux-gnueabi-nm program.elf
+
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ arm-linux-gnueabi-nm program.elf
+08000208 T __aeabi_unwind_cpp_pr0
+08000224 D program_E
+08000200 T run
+Ub2004-rt38:~/github/embedded-ada-tests/test-m3-codes$ 
+
+===========================================================
+STACK SPACE (LIFO) Starts from bottom
+===========================================================
+
+The expected top of stack value deserves a bit of explanation. 
+
+(1) The program uses the stack space to store local variables and to manage the 
+whole function call and return mechanics. 
+
+(2) The stack is allocated towards lower addresses, starting from the
+top-of-stack address. 
+
+(3) When there is a need to store some value on the stack, the processor 
+pushes that value by decreasing the so-called stack pointer and then by 
+storing the value in the newly computed location. 
+
+(4) For example, if the stack pointer (SP) has the value 0x20001000, 
+then pushing a 32-bit word to the stack is performed by decreasing the stack 
+pointer (SP) by 4 bytes (so the new stack pointer value will be 0x20000ffc) 
+and then storing the 32-bit word at that location (so the value will occupy
+4 bytes at addresses 0x20000ffc, 0x20000ffd, 0x20000ffe and 0x20000fff). 
+
+(5) Similarly, further words will be pushed at lower addresses. Thus, top-of-stack
+address 0x20001000 is appropriate if we want to locate the stack at the 
+end of available memory that extends up to 0x20000fff.
+
+(6) Note that it is not necessary to locate the stack at the end of 
+available SRAM memory and in some systems it might make sense to locate it 
+somewhere else or to even manage multiple stacks for isolated parts of 
+the system. 
+
+(7) In simple setups, however, it is common and reasonable to allocate 
+the stack space at the end of available memory and therefore give it
+maximum capacity for growth towards the beginning of SRAM (that it, towards 
+lower addresses), where the program might want to allocate other objects
+like static variables.
+
+(8) Note also that the least-significant bit of each program counter (PC) 
+value should be 1 to indicate the appropriate (Thumb) instruction set. 
+This is a property of all ARM Cortex-M controllers.
+
+===========================================================
+VECTOR TABLE (INTERRUPTS)
+===========================================================
+
+(1) The vector table should start at the beginning of the address space and so 
+should be placed at the beginning of the binary image that we want to upload 
+to the flash memory.
+
+(2) The vector table defines some more slots, but we will not need them at the 
+moment. The extent of the whole table depends on the target microcontroller 
+or to be more exact, on the number of different interrupts that the 
+microcontroller is able to handle. This can be found in chapters devoted to 
+interrupts and exception vectors. 
+
+(4) For Arduino and Nucleo-32 boards we can generously assume that the whole 
+range from 0x00 to 0xFF is reserved for vector table.
+
+(5) But the microcontroller used in Nucleo-144 is more capable with regard 
+to interrupt handling and we will reserve the range 0x00 to 0x1FF for 
+the vector table. 
+
+(6) In any case, the whole table should be mostly zeroed except for the 
+first two slots, as described already. We can use the remaining memory 
+(that is, from 0x100 or 0x200 upwards, counting from the beginning of the 
+binary image) for other needs, like our program's code and data. 
+
+(7) In our first program the only thing that we really need apart from 
+the vector table is the executable code for the Run procedure.
+
+===========================================================
+ABOUT LINKER SCRIPT (flash.ld)
+===========================================================
+In summary, we need to prepare the binary image that will contain, 
+from the beginning:
+
+(1) top of stack value,
+(2) address of our Run procedure (seen as run here),
+(3) zeros till the end of the vector table,
+(4) the executable code for the Run procedure.
+
+The linker script (stored in file flash.ld ) that knows how to prepare 
+the image according to these requirements will be different depending 
+on the target device.
+
+===========================================================
+Arduino Due flash.ld
+===========================================================
+The linker script for Arduino Due is (note 0x00080000 as the beginning 
+of the flash memory and 0x20088000 as the top-of-stack value, which is 
+past-the-end address in SRAM):
+
+OUTPUT_FORMAT("elf32-littlearm")
+OUTPUT_ARCH(arm)
+SECTIONS
+{
+	.vectors 0x00080000 :
+	{
+		LONG(0x20088000)
+		LONG(run + 1)
+		FILL(0)
+	}
+	.text 0x00080100 :
+	{
+		*(.text)
+	}
+}
+
+REBUILD (SEE THE DATE_TIME)
+===========================================================
+armcortex-m3-AT91SAM3X8E-arduino-due$ arm-linux-gnueabi-ld -T flash.ld -o program.elf program.o wr_unwind.o
+armcortex-m3-AT91SAM3X8E-arduino-due$ arm-linux-gnueabi-objcopy -O binary program.elf program.bin
+armcortex-m3-AT91SAM3X8E-arduino-due$ arm-linux-gnueabi-objcopy -O ihex program.elf program.hex
+armcortex-m3-AT91SAM3X8E-arduino-due$ ls -al
+total 120
+drwxrwxr-x 2 wruslan wruslan  4096 Jan 10 11:10 .
+drwxrwxr-x 8 wruslan wruslan  4096 Jan  8 08:59 ..
+-rw-rw-r-- 1 wruslan wruslan 27943 Jan  9 09:27 chapter-03-test-m3.txt
+-rw-r--r-- 1 wruslan wruslan   175 Jan 10 10:53 flash.ld
+-rw-r--r-- 1 wruslan wruslan   122 Mar  4  2016 program.adb
+-rw-r--r-- 1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan   441 Jan  7 11:18 program.ali
+-rwxrwxr-x 1 wruslan wruslan   294 Jan 10 11:09 program.bin
+-rwxrwxr-x 1 wruslan wruslan 66728 Jan 10 11:09 program.elf
+-rw-rw-r-- 1 wruslan wruslan   208 Jan 10 11:10 program.hex
+-rw-rw-r-- 1 wruslan wruslan  1120 Jan  7 11:18 program.o
+-rw-rw-r-- 1 wruslan wruslan   772 Jan  7 11:11 program.s
+-rw-rw-r-- 1 wruslan wruslan 27943 Jan  9 09:28 success-chapter-03-test-m3.txt
+-rw-rw-r-- 1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r-- 1 wruslan wruslan   836 Jan  7 11:20 wr_unwind.o
+-rw-rw-r-- 1 wruslan wruslan   761 Jan  7 11:13 wr_unwind.s
+armcortex-m3-AT91SAM3X8E-arduino-due$ 
+
+===========================================================
+STM32 Nucleo-144 flash.ld
+===========================================================
+
+The linker script for Nucleo-144 is (note 0x08000000 as the beginning 
+of the flash memory and 0x20010000 as the top-of-stack value, which is 
+past-the-end address in SRAM; note also that we have reserved 0x200 bytes 
+for the vector table, which is twice as much as in the smaller boards):
+
+OUTPUT_FORMAT("elf32-littlearm")
+OUTPUT_ARCH(arm)
+SECTIONS
+{
+	.vectors 0x08000000 :
+	{
+		LONG(0x20010000)
+		LONG(run + 1)
+		FILL(0)
+	}
+	.text 0x08000200 :
+	{
+		*(.text)
+	}
+}
+
+REBUILD (SEE THE DATE_TIME)
+===========================================================
+armcortex-m7-STM32F767ZI-nucleo-144$ arm-linux-gnueabi-ld -T flash.ld -o program.elf program.o wr_unwind.o
+armcortex-m7-STM32F767ZI-nucleo-144$ arm-linux-gnueabi-objcopy -O binary program.elf program.bin
+armcortex-m7-STM32F767ZI-nucleo-144$ arm-linux-gnueabi-objcopy -O ihex program.elf program.hex
+armcortex-m7-STM32F767ZI-nucleo-144$ ls -al
+total 116
+drwxrwxr-x 2 wruslan wruslan  4096 Jan 10 11:14 .
+drwxrwxr-x 8 wruslan wruslan  4096 Jan  8 08:59 ..
+-rw-rw-r-- 1 wruslan wruslan 20588 Jan  9 09:58 chapter-03-test-m7.txt
+-rw-r--r-- 1 wruslan wruslan   175 Jan 10 11:00 flash.ld
+-rw-r--r-- 1 wruslan wruslan   122 Mar  4  2016 program.adb
+-rw-r--r-- 1 wruslan wruslan    86 Mar  4  2016 program.ads
+-rw-rw-r-- 1 wruslan wruslan   442 Jan  7 12:00 program.ali
+-rwxrwxr-x 1 wruslan wruslan   550 Jan 10 11:13 program.bin
+-rwxrwxr-x 1 wruslan wruslan 66984 Jan 10 11:13 program.elf
+-rw-rw-r-- 1 wruslan wruslan   208 Jan 10 11:14 program.hex
+-rw-rw-r-- 1 wruslan wruslan  1120 Jan  7 12:00 program.o
+-rw-rw-r-- 1 wruslan wruslan   773 Jan  7 11:54 program.s
+-rw-r--r-- 1 wruslan wruslan  2037 Jan  8 11:59 stm32f7x.cfg
+-rw-rw-r-- 1 wruslan wruslan 20762 Jan  9 10:02 success-chapter-03-test-m7.txt
+-rw-rw-r-- 1 wruslan wruslan    40 Jan  7 10:03 wr_unwind.c
+-rw-rw-r-- 1 wruslan wruslan    36 Jan  7 10:03 wr_unwind.h
+-rw-rw-r-- 1 wruslan wruslan   840 Jan  7 12:02 wr_unwind.o
+-rw-rw-r-- 1 wruslan wruslan   762 Jan  7 11:55 wr_unwind.s
+armcortex-m7-STM32F767ZI-nucleo-144$ 
+
+===========================================================
+od - dump files in octal and other formats
+===========================================================
+armcortex-m7-STM32F767ZI-nucleo-144$ arm-linux-gnueabi-nm program.elf
+08000208 T __aeabi_unwind_cpp_pr0
+08000224 D program_E
+08000200 T run
+armcortex-m7-STM32F767ZI-nucleo-144$ 
+
+armcortex-m7-STM32F767ZI-nucleo-144$ od program.bin
+0000000 000000 020001 001001 004000 000000 000000 000000 000000
+0000020 000000 000000 000000 000000 000000 000000 000000 000000
+*
+0001000 132200 127400 137400 163775 132200 127400 137400 043275
+0001020 136200 043560 177754 077777 100010 100227 177754 077777
+0001040 000001 000000 000000
+0001046
+
+armcortex-m7-STM32F767ZI-nucleo-144$ od program.hex
+0000000 030072 030062 030060 030060 030064 030070 043060 006462
+0000020 035012 034060 030060 030060 030060 030060 030060 030460
+0000040 030062 030460 031060 030060 034060 041503 005015 030472
+0000060 030060 030062 030060 034060 041060 030064 040460 030106
+0000100 041060 043106 042504 034067 041060 030064 040460 030106
+0000120 041060 041106 032104 041466 006463 035012 032060 031060
+0000140 030061 030060 030070 041502 030067 033464 033506 005015
+0000160 030472 030060 030462 030064 042460 043103 043106 033506
+0000200 030106 034070 034460 034067 042460 043103 043106 033506
+0000220 030106 030061 030060 030060 033060 006470 035012 031060
+0000240 031060 032062 030060 030060 030060 034104 005015 030072
+0000260 030064 030060 030060 030065 030070 030060 030062 042460
+0000300 006504 035012 030060 030060 030060 030460 043106 005015
+0000320
+
+armcortex-m7-STM32F767ZI-nucleo-144$ od program.elf
+0000000 042577 043114 000401 000001 000000 000000 000000 000000
+0000020 000002 000050 000001 000000 001000 004000 000064 000000
+0000040 002030 000001 001000 002400 000064 000040 000003 000050
+0000060 000012 000011 000001 070000 001024 000001 001024 004000
+0000100 001024 004000 000020 000000 000020 000000 000004 000000
+0000120 000004 000000 000001 000000 000000 000001 000000 004000
+0000140 000000 004000 001046 000000 001046 000000 000007 000000
+0000160 000000 000001 162521 062164 000000 000000 000000 000000
+0000200 000000 000000 000000 000000 000000 000000 000006 000000
+0000220 000020 000000 000000 000000 000000 000000 000000 000000
+0000240 000000 000000 000000 000000 000000 000000 000000 000000
+*
+0200000 000000 020001 001001 004000 000000 000000 000000 000000
+0200020 000000 000000 000000 000000 000000 000000 000000 000000
+*
+0201000 132200 127400 137400 163775 132200 127400 137400 043275
+0201020 136200 043560 177754 077777 100010 100227 177754 077777
+0201040 000001 000000 000000 041507 035103 024040 061125 067165
+0201060 072564 034440 031456 030056 030455 072467 072542 072156
+0201100 030565 031176 027060 032060 020051 027071 027063 000060
+0201120 026501 000000 060400 060545 064542 000400 000043 000000
+0201140 033405 026505 000115 006406 046407 001011 002022 000424
+0201160 000425 001427 000430 000431 001032 003036 000442 000000
+0201200 000000 000000 000000 000000 000000 000000 000000 000000
+0201220 000000 000000 000000 004000 000000 000000 000003 000001
+0201240 000000 000000 001000 004000 000000 000000 000003 000002
+0201260 000000 000000 001024 004000 000000 000000 000003 000003
+0201300 000000 000000 001044 004000 000000 000000 000003 000004
+0201320 000000 000000 000000 000000 000000 000000 000003 000005
+0201340 000000 000000 000000 000000 000000 000000 000003 000006
+0201360 000001 000000 000000 000000 000000 000000 000004 177761
+0201400 000015 000000 001000 004000 000000 000000 000000 000002
+0201420 000020 000000 001024 004000 000000 000000 000000 000003
+0201440 000020 000000 001044 004000 000000 000000 000000 000004
+0201460 000023 000000 000000 000000 000000 000000 000004 177761
+0201500 000015 000000 001010 004000 000000 000000 000000 000002
+0201520 000037 000000 001011 004000 000014 000000 000022 000002
+0201540 000066 000000 001044 004000 000002 000000 000021 000004
+0201560 000100 000000 001001 004000 000010 000000 000022 000002
+0201600 070000 067562 071147 066541 060456 061144 022000 000164
+0201620 062044 073400 057562 067165 064567 062156 061456 057400
+0201640 060537 060545 064542 072537 073556 067151 057544 070143
+0201660 057560 071160 000060 071160 063557 060562 057555 000105
+0201700 072562 000156 027000 074563 072155 061141 027000 072163
+0201720 072162 061141 027000 064163 072163 072162 061141 027000
+0201740 062566 072143 071157 000163 072056 074145 000164 040456
+0201760 046522 062456 064570 074144 027000 060544 060564 027000
+0202000 067543 066555 067145 000164 040456 046522 060456 072164
+0202020 064562 072542 062564 000163 000000 000000 000000 000000
+0202040 000000 000000 000000 000000 000000 000000 000000 000000
+*
+0202100 000033 000000 000001 000000 000003 000000 000000 004000
+0202120 000000 000001 000010 000000 000000 000000 000000 000000
+0202140 000001 000000 000000 000000 000044 000000 000001 000000
+0202160 000006 000000 001000 004000 001000 000001 000024 000000
+0202200 000000 000000 000000 000000 000004 000000 000000 000000
+0202220 000052 000000 000001 070000 000202 000000 001024 004000
+0202240 001024 000001 000020 000000 000002 000000 000000 000000
+0202260 000004 000000 000000 000000 000065 000000 000001 000000
+0202300 000003 000000 001044 004000 001044 000001 000002 000000
+0202320 000000 000000 000000 000000 000002 000000 000000 000000
+0202340 000073 000000 000001 000000 000060 000000 000000 000000
+0202360 001046 000001 000052 000000 000000 000000 000000 000000
+0202400 000001 000000 000001 000000 000104 000000 000003 070000
+0202420 000000 000000 000000 000000 001120 000001 000056 000000
+0202440 000000 000000 000000 000000 000001 000000 000000 000000
+0202460 000001 000000 000002 000000 000000 000000 000000 000000
+0202500 001200 000001 000400 000000 000010 000000 000015 000000
+0202520 000004 000000 000020 000000 000011 000000 000003 000000
+0202540 000000 000000 000000 000000 001600 000001 000104 000000
+0202560 000000 000000 000000 000000 000001 000000 000000 000000
+0202600 000021 000000 000003 000000 000000 000000 000000 000000
+0202620 001704 000001 000124 000000 000000 000000 000000 000000
+0202640 000001 000000 000000 000000
+0202650
+armcortex-m7-STM32F767ZI-nucleo-144$ 
+
+===========================================================
+ALHAMDULILLAH 3 TIMES WRY.
+===========================================================
+
+armcortex-m7-STM32F767ZI-nucleo-144$ od -A x -v -t x4 program.bin
+000000 20010000 08000201 00000000 00000000
+000010 00000000 00000000 00000000 00000000
+000020 00000000 00000000 00000000 00000000
+000030 00000000 00000000 00000000 00000000
+000040 00000000 00000000 00000000 00000000
+000050 00000000 00000000 00000000 00000000
+000060 00000000 00000000 00000000 00000000
+000070 00000000 00000000 00000000 00000000
+000080 00000000 00000000 00000000 00000000
+000090 00000000 00000000 00000000 00000000
+0000a0 00000000 00000000 00000000 00000000
+0000b0 00000000 00000000 00000000 00000000
+0000c0 00000000 00000000 00000000 00000000
+0000d0 00000000 00000000 00000000 00000000
+0000e0 00000000 00000000 00000000 00000000
+0000f0 00000000 00000000 00000000 00000000
+000100 00000000 00000000 00000000 00000000
+000110 00000000 00000000 00000000 00000000
+000120 00000000 00000000 00000000 00000000
+000130 00000000 00000000 00000000 00000000
+000140 00000000 00000000 00000000 00000000
+000150 00000000 00000000 00000000 00000000
+000160 00000000 00000000 00000000 00000000
+000170 00000000 00000000 00000000 00000000
+000180 00000000 00000000 00000000 00000000
+000190 00000000 00000000 00000000 00000000
+0001a0 00000000 00000000 00000000 00000000
+0001b0 00000000 00000000 00000000 00000000
+0001c0 00000000 00000000 00000000 00000000
+0001d0 00000000 00000000 00000000 00000000
+0001e0 00000000 00000000 00000000 00000000
+0001f0 00000000 00000000 00000000 00000000
+000200 af00b480 e7fdbf00 af00b480 46bdbf00
+000210 4770bc80 7fffffec 80978008 7fffffec
+000220 00000001 00000000
+000226
+
+armcortex-m7-STM32F767ZI-nucleo-144$ od -A x -v -t x4 program.hex
+000000 3032303a 30303030 30383034 0d324630
+000010 38303a0a 30303030 30303030 31303030
+000020 31303032 30303230 43433830 313a0a0d
+000030 30323030 38303030 30344230 30464130
+000040 46464230 38374544 30344230 30464130
+000050 42464230 43363444 3a0a0d33 32303430
+000060 30303031 43423038 37343037 0a0d3746
+000070 3030313a 30343132 46434530 37464646
+000080 38383046 38373930 46434530 37464646
+000090 30313046 30303030 0d383630 32303a0a
+0000a0 34323230 30303030 38443030 303a0a0d
+0000b0 30303034 30353030 30303038 45303032
+0000c0 3a0a0d44 30303030 31303030 0a0d4646
+0000d0
+
+armcortex-m7-STM32F767ZI-nucleo-144$ od -A x -v -t x4 program.elf
+000000 464c457f 00010101 00000000 00000000
+000010 00280002 00000001 08000200 00000034
+000020 00010418 05000200 00200034 00280003
+000030 0009000a 70000001 00010214 08000214
+000040 08000214 00000010 00000010 00000004
+000050 00000004 00000001 00010000 08000000
+000060 08000000 00000226 00000226 00000007
+000070 00010000 6474e551 00000000 00000000
+000080 00000000 00000000 00000000 00000006
+000090 00000010 00000000 00000000 00000000
+0000a0 00000000 00000000 00000000 00000000
+....
+....  VERY LONG ZEROES
+....
+0101c0 00000000 00000000 00000000 00000000
+0101d0 00000000 00000000 00000000 00000000
+0101e0 00000000 00000000 00000000 00000000
+0101f0 00000000 00000000 00000000 00000000
+010200 af00b480 e7fdbf00 af00b480 46bdbf00
+010210 4770bc80 7fffffec 80978008 7fffffec
+010220 00000001 43470000 28203a43 6e756255
+010230 39207574 302e332e 7537312d 746e7562
+010240 327e3175 34302e30 2e392029 00302e33
+010250 00002d41 61656100 01006962 00000023
+010260 2d453705 0d06004d 02094d07 01140412
+010270 03170115 01190118 061e021a 00000122
+010280 00000000 00000000 00000000 00000000
+010290 00000000 08000000 00000000 00010003
+0102a0 00000000 08000200 00000000 00020003
+0102b0 00000000 08000214 00000000 00030003
+0102c0 00000000 08000224 00000000 00040003
+0102d0 00000000 00000000 00000000 00050003
+0102e0 00000000 00000000 00000000 00060003
+0102f0 00000001 00000000 00000000 fff10004
+010300 0000000d 08000200 00000000 00020000
+010310 00000010 08000214 00000000 00030000
+010320 00000010 08000224 00000000 00040000
+010330 00000013 00000000 00000000 fff10004
+010340 0000000d 08000208 00000000 00020000
+010350 0000001f 08000209 0000000c 00020012
+010360 00000036 08000224 00000002 00040011
+010370 00000040 08000201 00000008 00020012
+010380 6f727000 6d617267 6264612e 00742400
+010390 77006424 6e755f72 646e6977 5f00632e
+0103a0 6165615f 755f6962 6e69776e 70635f64
+0103b0 72705f70 72700030 6172676f 00455f6d
+0103c0 006e7572 79732e00 6261746d 74732e00
+0103d0 62617472 68732e00 74727473 2e006261
+0103e0 74636576 0073726f 7865742e 412e0074
+0103f0 652e4d52 78646978 61642e00 2e006174
+010400 6d6d6f63 00746e65 4d52412e 7474612e
+010410 75626972 00736574 00000000 00000000
+010420 00000000 00000000 00000000 00000000
+010430 00000000 00000000 00000000 00000000
+010440 0000001b 00000001 00000003 08000000
+010450 00010000 00000008 00000000 00000000
+010460 00000001 00000000 00000024 00000001
+010470 00000006 08000200 00010200 00000014
+010480 00000000 00000000 00000004 00000000
+010490 0000002a 70000001 00000082 08000214
+0104a0 00010214 00000010 00000002 00000000
+0104b0 00000004 00000000 00000035 00000001
+0104c0 00000003 08000224 00010224 00000002
+0104d0 00000000 00000000 00000002 00000000
+0104e0 0000003b 00000001 00000030 00000000
+0104f0 00010226 0000002a 00000000 00000000
+010500 00000001 00000001 00000044 70000003
+010510 00000000 00000000 00010250 0000002e
+010520 00000000 00000000 00000001 00000000
+010530 00000001 00000002 00000000 00000000
+010540 00010280 00000100 00000008 0000000d
+010550 00000004 00000010 00000009 00000003
+010560 00000000 00000000 00010380 00000044
+010570 00000000 00000000 00000001 00000000
+010580 00000011 00000003 00000000 00000000
+010590 000103c4 00000054 00000000 00000000
+0105a0 00000001 00000000
+0105a8
+armcortex-m7-STM32F767ZI-nucleo-144$ 
+
+==========================================================
+Arduino-M0 and Arduino Due
+==========================================================
+These two facts are important:
+
+(1) the vector table will be aliased at the beginning of the address 
+space (at 0x0) - that is, the top of stack value will be visible in the first 
+word of memory and the reset handler address will be visible in the
+second word: this is where the processor will look for them right after reboot,
+
+(2) the executable code will begin at 0x00080100, which is within the 
+flash block where it was loaded and where the reset handler vector points at.
+
+The above facts are consistent and allow the processor to properly execute the
+Run procedure after reset.
+
+===========================================================
+STM32 Nucleo and STM32 Nucleo-144
+===========================================================
+
+As you see, the content of the program.bin image file is loaded into the 
+flash block of memory starting at 0x08000000, but then, thanks to the special
+controlling register that is set automatically after the image is loaded, 
+each subsequent reboot will cause the initial region of memory to be aliased 
+or mirrored from the flash memory (that is, the same content will be visible 
+in two address regions) and this is what allows the processor to properly 
+find and match everything. These two facts are important:
+
+(1) the vector table will be aliased at the beginning of the address space
+(at 0x0) - that is, the top of stack value will be visible in the first word 
+of memory and the reset handler address will be visible in the second word: 
+this is where the processor will look for them right after reboot,
+
+(2) the executable code will begin at 0x08000100 or 0x08000200, which is 
+within the flash block where it was loaded and where the reset handler 
+vector points at.
+
+The above facts are consistent and allow the processor to properly execute 
+the Run procedure after reset.
+
+In any case, you have seen that the linker script, even as simple as the 
+ones we have used, is a powerful tool that allows us to prepare binary images 
+exactly as expected by hardware.
+
+===========================================================
+ALHAMDULILLAH 3 TIMES WRY.
+===========================================================
+
